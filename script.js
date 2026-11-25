@@ -118,8 +118,8 @@ function render(){
   document.body.dataset.view=view;
   if(view==='welcome'){welcome();return}
   const[yr,se]=P()[S.sem][0].split(' · ');
-  $('crumb').textContent=LIC[S.lic].n.toLowerCase()+' · '+yr;
-  $('semTitle').textContent=`semestre ${se.slice(1)}`;
+  $('licName').textContent=LIC[S.lic].n;
+  $('semPill').textContent=`${yr} · semestre ${se.slice(1)}`;
   document.querySelectorAll('[data-rule]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.rule===S.rule));
   const pa=partner();$('annRule').hidden=!pa;
   if(pa){$('annYes').textContent=`oui : ${[S.sem,pa].sort().join(' + ')}`;document.querySelectorAll('[data-ann]').forEach(b=>b.setAttribute('aria-pressed',(b.dataset.ann==='1')===!!S.annual))}
