@@ -250,3 +250,7 @@ a.btn{color:var(--ink);text-decoration:none}
 .sem-pill{display:inline-flex;align-items:center;padding:6px 16px;font-size:clamp(15px,1.6vw,19px);font-weight:800;color:#111;background:var(--yellow);border:var(--b);border-radius:999px;box-shadow:var(--sh-sm);white-space:nowrap}
 .head{max-width:none}
 .head .title{font-size:clamp(26px,3.4vw,40px);text-wrap:wrap}
+/* menu « 1 note / 2 CC… » : flèche dessinée, bien placée */
+.rtools .in.nk{appearance:none;-webkit-appearance:none;text-align:left;padding:0 34px 0 12px;font-weight:700;font-size:14.5px;line-height:40px;cursor:pointer;
+  background:var(--surface) no-repeat right 12px center/14px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23E8635A' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")}
+.rtools .in.nk:hover{background-color:var(--bg)}
