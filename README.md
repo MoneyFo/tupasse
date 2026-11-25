@@ -13,7 +13,7 @@ Calcule la note qu'il te faut au prochain examen pour valider ton semestre à l'
 - Chaque matière a **2 CC** (qui comptent pareil, 50/50) et **1 rattrapage**.
 - Tant qu'il reste des CC à passer, le site donne la note à viser au(x) CC restant(s).
   Quand tous les CC sont notés et que le semestre n'est pas validé, il donne la note à viser au rattrapage
-  (matières sous 10 cochées « je repasse » par défaut, modifiable).
+  (bouton « rattrapage ? » sur chaque matière ; celles sous 10 sont cochées par défaut).
 - Trois règles de rattrapage au choix :
   - il remplace la moyenne des CC s'il est meilleur ;
   - il remplace le plus faible des 2 CC ;

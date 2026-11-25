@@ -102,7 +102,7 @@ function render(){
           <label class="f">cc1<input class="in" data-f="c1" inputmode="decimal" placeholder="?" value="${esc(r.c1)}"></label>
           <label class="f">cc2<input class="in" data-f="c2" inputmode="decimal" placeholder="?" value="${esc(r.c2)}"></label>
           <label class="f ra">rattrapage<input class="in" data-f="ra" inputmode="decimal" placeholder="—" value="${esc(r.ra)}"></label>
-          <button class="mini" data-act="rt" hidden>je repasse</button>`}
+          <button class="mini" data-act="rt" hidden>rattrapage ?</button>`}
           <button class="mini va" data-act="va" aria-pressed="${!!r.va}" title="matière déjà validée (redoublement)">${r.va?'✓ validée':'validée ?'}</button></div></div>`).join('')}
       ${S.edit?`<button class="add" data-act="add">+ ajouter une matière</button>`:''}</section>`}).join('');
   if(S.edit)h+=`<button class="btn cor" data-act="reset">remettre la maquette d'origine</button>`;
@@ -117,14 +117,14 @@ function update(){
   const all=calc(rows()),g=groups(),per={};for(const k in g)per[k]=calc(g[k].map(x=>x[0]));
   for(const k in B){const t=document.querySelector(`[data-tot="${k}"]`),p=per[k];
     if(t&&p)t.textContent=`${fmt(g[k].reduce((s,[r])=>s+ects(r),0))} ects`+(p.cur!=null?` · moyenne ${fmt(p.cur)}`:'');
-    const n=document.querySelector(`[data-bneed="${k}"]`);if(n)n.innerHTML=p&&!S.edit?`<span class="tag ${p.valid||!p.E?'t':'y'}">${short(p)}</span>`:''}
+    const n=document.querySelector(`[data-bneed="${k}"]`);if(n)n.innerHTML=p&&!S.edit&&(p.valid||!p.E)?`<span class="tag t">${short(p)}</span>`:''}
   document.querySelectorAll('#list .row[data-i]').forEach(el=>{const r=rows()[el.dataset.i],c=el.querySelector('[data-chip]'),bt=el.querySelector('[data-act=rt]');if(!c)return;
     if(r.va){c.innerHTML='<span class="tag t">acquise · hors calcul</span>';return}
     const G=per[r.b],avg=ccAvg(r);
-    if(G.phase===1)c.innerHTML=avg==null?tag(G.need,'vise'):`<span class="tag">= ${fmt(avg)}</span>`;
-    else if(G.inR(r))c.innerHTML=tag(G.need,'ratt. : vise');
+    if(G.phase===1)c.innerHTML=avg==null?'':`<span class="tag">= ${fmt(avg)}</span>`;
+    else if(G.inR(r))c.innerHTML='';
     else{const m=rated(r,num(r.ra));c.innerHTML=`<span class="tag ${m<10?'p':''}">= ${fmt(m)}</span>`}
-    if(bt){bt.hidden=!(G.phase===2&&!G.valid&&!ok(num(r.ra))&&avg!=null);bt.setAttribute('aria-pressed',G.inR(r))}});
+    if(bt){bt.hidden=!(G.phase===2&&!G.valid&&!ok(num(r.ra))&&avg!=null);bt.setAttribute('aria-pressed',G.inR(r));bt.textContent=G.inR(r)?'✓ rattrapage':'rattrapage ?'}});
   // en tête : le bloc le plus serré
   let R=null,which='',w=null;
   for(const k in per){const p=per[k];if(!p.E)continue;const sc=p.valid?-99:p.need==null?99:p.need;if(!w||sc>w.s)w={s:sc,k}}
@@ -133,7 +133,7 @@ function update(){
   let s='',big='–',sub='',lbl=pre+'note à viser '+ep;
   if(!R){s='done';lbl='note à viser';sub=rows().length?'toutes les matières sont déjà validées.':'ajoute tes matières et leurs ects pour commencer.'}
   else if(R.valid){s='ok';lbl='tous les blocs';big='validé';sub='chaque bloc a déjà 10 de moyenne'+(R.phase===2?', pas besoin de rattrapage.':'.')}
-  else if(R.need==null){s='no';lbl=pre+'moyenne après les CC';big=fmt(R.fin)+'<small>/20</small>';sub=`il manque ${fmt(10-R.fin)} point(s) à ce bloc. appuie sur « je repasse » pour les matières que tu passes au rattrapage.`}
+  else if(R.need==null){s='no';lbl=pre+'moyenne après les CC';big=fmt(R.fin)+'<small>/20</small>';sub=`il manque ${fmt(10-R.fin)} point(s) à ce bloc. appuie sur « rattrapage ? » pour les matières que tu passes au rattrapage.`}
   else if(R.need<=0){s='ok';big='0<small>/20</small>';sub=`même avec 0 ${ep}, tous tes blocs sont à 10.`}
   else if(R.need>20){s='no';big='&gt;20';sub=R.phase===1?`même avec 20 ${ep}, ce bloc plafonne à ${fmt(R.f(20))}. il restera le rattrapage.`:`même avec 20 au rattrapage sur ces ${R.n} matière(s), ce bloc plafonne à ${fmt(R.f(20))}. ajoute des matières à repasser.`}
   else{const n=ceil(R.need);s=n<=10?'':n<=14?'mid':'hard';big=fmt(n)+'<small>/20</small>';
