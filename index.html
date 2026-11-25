@@ -21,8 +21,27 @@
 
   <nav class="nav">
     <div class="logo"><i>/20</i>ma moyenne</div>
-    <div class="tabs" id="tabs" role="group" aria-label="semestre"></div>
+    <div class="navr">
+      <button class="btn lic" id="licBtn" title="changer de licence ou de semestre"></button>
+      <div class="tabs" id="tabs" role="group" aria-label="semestre"></div>
+    </div>
   </nav>
+
+  <section class="welcome" id="welcome" aria-labelledby="wt">
+    <svg class="deco spin" width="54" height="54" style="top:6px;left:58%" fill="#7B6CF6"><use href="#star"/></svg>
+    <svg class="deco" width="90" height="90" style="bottom:40px;left:-30px;opacity:.6" fill="#4ECDC4"><use href="#blob"/></svg>
+    <svg class="deco" width="28" height="28" style="bottom:120px;right:-6px;transform:rotate(15deg)" fill="#F9A8B8"><use href="#star"/></svg>
+    <h1 id="wt">salut ! tu es <span class="hl">en quelle licence</span> ?</h1>
+    <p>choisis ta licence, puis ton semestre : on s'occupe des calculs.</p>
+    <div class="wcard">
+      <div class="step"><span class="num">1</span><label for="licSel">ta licence</label></div>
+      <select id="licSel" class="sel"></select>
+      <p class="wsub" id="licSub"></p>
+      <div class="step"><span class="num">2</span><span>ton semestre</span></div>
+      <div class="semgrid" id="semGrid"></div>
+      <p class="note" style="margin:16px 0 0;transform:rotate(-1.5deg)">tes notes restent dans ton navigateur ✦</p>
+    </div>
+  </section>
 
   <header class="head">
     <h1>combien il te faut au <span class="hl">prochain exam</span> ?</h1>
@@ -41,7 +60,7 @@
       </div>
       <p class="sample" id="sample" hidden>notes d'exemple pré-remplies : clique « vider les notes » pour repartir de zéro.</p>
       <div id="list"></div>
-      <p class="foot">maquette : licence informatique 2025-2026 (matières facultatives à 0 ects retirées). chaque matière = CC1 + CC2, puis rattrapage si le semestre n’est pas validé. le calcul suppose la même note sur toutes les épreuves restantes. vérifie le règlement de ta fac : notes éliminatoires, compensation annuelle, seconde chance… peuvent changer la donne.</p>
+      <p class="foot">maquette fournie : licence informatique 2025-2026 (matières facultatives à 0 ects retirées). chaque matière = CC1 + CC2, puis rattrapage si le semestre n’est pas validé. le calcul suppose la même note sur toutes les épreuves restantes. vérifie le règlement de ta fac : notes éliminatoires, compensation annuelle, seconde chance… peuvent changer la donne.</p>
     </main>
 
     <aside class="res" aria-live="polite">

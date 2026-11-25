@@ -2,6 +2,8 @@
 
 Calcule la note qu'il te faut au prochain examen pour valider ton semestre à l'université.
 
+À l'arrivée, tu choisis ta licence dans un menu déroulant, puis ton semestre. Le bouton « changer » en haut ramène à ce choix.
+
 - Les **ECTS servent de coefficients** (une matière à 5 ECTS compte 5 fois).
 - Tu remplis les notes que tu as déjà. Ce qui reste à passer, tu le laisses vide.
 - Le site calcule la note à avoir **sur chaque épreuve restante** pour atteindre 10 (ou 12, 14, 16 pour une mention).
@@ -19,7 +21,11 @@ Calcule la note qu'il te faut au prochain examen pour valider ton semestre à l'
 - La maquette est modifiable : ajouter, renommer, supprimer des matières ou changer leurs ECTS.
 - Les notes restent dans ton navigateur (localStorage), rien n'est envoyé nulle part.
 
-Maquette fournie par défaut : Licence Informatique 2025-2026 (L1 à L3, S1 à S6).
+Licences disponibles :
+- **Licence Informatique** : maquette 2025-2026 pré-remplie (L1 à L3, S1 à S6) ;
+- **Autre licence** : maquette vide, tu ajoutes tes matières et leurs ECTS.
+
+Pour ajouter une licence pré-remplie, ajoute une entrée dans l'objet `LIC` de `script.js`.
 
 ## Lancer
 

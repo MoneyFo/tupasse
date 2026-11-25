@@ -1,4 +1,4 @@
-const P={
+const INFO={
  S1:['L1 · S1',[['DS','Logique propositionnelle et des prédicats, algèbre linéaire, arithmétique',4],['DS','Polynômes, raisonnement, récursion, induction, dénombrement',4],['DS',"Initiation à l'informatique de base",2],['DS',"Introduction à l'algorithmique et à la programmation (python)",6],['DS','Application algorithmique (scratch, LARP, Coding Game…)',2],['DS','Programmation web : HTML 5 / CSS',4],['TS','CNB : compétences numériques, bureautique, PIX',3],['ES','Méthodologie de la programmation, versioning, génie logiciel',2],['ES','PREPRO : connaissance de soi',2],['ES','Méthodologie de la recherche documentaire',1]]],
  S2:['L1 · S2',[['DS','Mathématiques pour l’informatique : calcul matriciel',2],['DS','Fonctions, vecteurs, récursivité, tris (python)',6],['DS','Structures de données fondamentales (python)',6],['DS','Programmation C niveau 1',6],['DS','Architecture des ordinateurs, représentation de l’info',4],['TS',"Activité d'ouverture (sport ou transitions)",2],['LS','Anglais',2],['ES','Transitions numériques',2]]],
  S3:['L2 · S3',[['DS','Maths pour l’informatique : analyse matricielle et numérique',4],['DS','Algorithmique niveau 2 : récursivité, tableaux ND',5],['DS','Programmation C niveau 2',5],['DS','Javascript, jQuery',3],['DS','Programmation objet niveau 1 : Java',6],['DS','Système d’exploitation niveau 1 : shell, regex',3],['LS','Anglais',2],['ES','PREPRO : découverte du monde professionnel',2]]],
@@ -6,18 +6,26 @@ const P={
  S5:['L3 · S5',[['DS','Architecture',3],['DS','Protocoles',5],['DS','Programmation mobile',5],['DS','Programmation par contraintes',5],['DS','Bases de données : conception et notions avancées',4],['TS','Compétences rédactionnelles',2],['LS','Anglais',2],['ES','Génie logiciel',4]]],
  S6:['L3 · S6',[['DS','Automates et théorie des langages',3],['DS','POO niveau 2 : Java, IHM, interfaces graphiques',5],['DS','Programmation mobile niveau 2',4],['DS','Système d’exploitation niveau 3 : communication inter-processus',3],['DS','Sécurité informatique',4],['TS','Transitions (en anglais)',2],['LS','Anglais',2],['ES','Stage en entreprise ou en laboratoire (7 semaines)',6],['ES','PREPRO : insertion dans le milieu professionnel',1]]]
 };
+const EMPTY=Object.fromEntries(Object.entries(INFO).map(([k,v])=>[k,[v[0],[]]]));
+const LIC={info:{n:'Licence Informatique',y:'maquette 2025-2026 · 6 semestres pré-remplis',P:INFO},
+  perso:{n:'Autre licence',y:'maquette vide : tu ajoutes tes matières et leurs ects',P:EMPTY}};
+const P=()=>LIC[S.lic]?LIC[S.lic].P:INFO;
 const B={DS:['compétences disciplinaires','var(--teal)','<path d="M8 6 3 12l5 6M16 6l5 6-5 6M14 4l-4 16"/>'],
  TS:['compétences transversales','var(--yellow)','<circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/>'],
  LS:['compétences linguistiques','var(--lav)','<path d="M4 5h16v11H9l-5 4z"/>'],
  ES:['compétences préprofessionnelles','var(--pink)','<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V4h6v3M3 13h18"/>']};
 const T=[[10,'10 · valider'],[12,'12 · assez bien'],[14,'14 · bien'],[16,'16 · très bien']];
 const KEY='ma-moyenne-v2',$=id=>document.getElementById(id);
-const fresh=s=>P[s][1].map(([b,n,e])=>({b,n,e,c1:'',c2:'',ra:'',rt:null}));
+const fresh=s=>P()[s][1].map(([b,n,e])=>({b,n,e,c1:'',c2:'',ra:'',rt:null}));
 let S=null;try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
-if(!S||!S.data){S={sem:'S1',target:10,mode:'sem',rule:'max',w1:50,edit:false,sample:true,data:{}};
+if(!S||!S.data){S={lic:'info',sem:'S1',target:10,mode:'sem',rule:'max',w1:50,edit:false,sample:true,data:{}};
   const r=fresh('S1'),c1=[9,8,11,10,12,8,13,12,11,14],c2={1:7,3:10,6:12,7:11,8:12,9:15};
   r.forEach((x,i)=>{x.c1=String(c1[i]);if(c2[i]!=null)x.c2=String(c2[i])});S.data.S1=r}
-const rows=()=>S.data[S.sem]||(S.data[S.sem]=fresh(S.sem));
+if(!LIC[S.lic])S.lic='info';
+for(const k of Object.keys(S.data))if(!k.includes(':')){S.data['info:'+k]=S.data[k];delete S.data[k]}
+const dkey=()=>S.lic+':'+S.sem;
+const rows=()=>S.data[dkey()]||(S.data[dkey()]=fresh(S.sem));
+let view='welcome';
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 const num=v=>{if(v==null||String(v).trim()==='')return null;const x=parseFloat(String(v).replace(',','.'));return isFinite(x)&&x>=0&&x<=20?x:NaN};
 const ok=x=>x!=null&&!isNaN(x);
@@ -63,14 +71,25 @@ function calc(list){
 const groups=()=>{const g={};rows().forEach((r,i)=>(g[r.b]=g[r.b]||[]).push([r,i]));return g};
 const tag=(need,pre)=>need==null?'':need<=0?'<span class="tag t">déjà ok</span>':need>20?'<span class="tag p">&gt; 20</span>':`<span class="tag y">${pre} ${fmt(ceil(need))}</span>`;
 
+function welcome(){
+  $('licSel').innerHTML=Object.entries(LIC).map(([k,l])=>`<option value="${k}"${k===S.lic?' selected':''}>${esc(l.n)}</option>`).join('');
+  $('licSub').textContent=LIC[S.lic].y;
+  const yrs={};for(const k of Object.keys(P())){const y=P()[k][0].split(' · ')[0];(yrs[y]=yrs[y]||[]).push(k)}
+  const col={L1:'var(--teal)',L2:'var(--lav)',L3:'var(--pink)'};
+  $('semGrid').innerHTML=Object.entries(yrs).map(([y,ks])=>`<div class="yr"><b>${y}</b>${ks.map(k=>{const n=(S.data[S.lic+':'+k]||P()[k][1]).length;
+    return `<button class="go" data-go="${k}" style="background:${col[y]||'var(--yellow)'}" aria-current="${k===S.sem}">${P()[k][0].split(' · ')[1]}<small>${n?n+' matières':'à remplir'}</small></button>`}).join('')}</div>`).join('');
+}
 function render(){
-  $('tabs').innerHTML=Object.keys(P).map(k=>`<button class="tab" data-sem="${k}" aria-pressed="${k===S.sem}">${P[k][0]}</button>`).join('');
+  document.body.dataset.view=view;
+  if(view==='welcome'){welcome();return}
+  $('licBtn').textContent=LIC[S.lic].n+' · changer';
+  $('tabs').innerHTML=Object.keys(P()).map(k=>`<button class="tab" data-sem="${k}" aria-pressed="${k===S.sem}">${P()[k][0]}</button>`).join('');
   document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===S.mode));
   document.querySelectorAll('[data-rule]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.rule===S.rule));
   $('w1').value=S.w1;$('w2').textContent=fmt(100-(+String(S.w1).replace(',','.')||0));
   $('editBtn').classList.toggle('on',S.edit);$('editBtn').textContent=S.edit?'terminer':'modifier la maquette';
   $('targets').innerHTML=T.map(([v,l])=>`<button class="pill" data-t="${v}" aria-pressed="${v===S.target}">${l}</button>`).join('');
-  $('sample').hidden=!(S.sample&&S.sem==='S1');
+  $('sample').hidden=!(S.sample&&S.lic==='info'&&S.sem==='S1');
   const g=groups();
   let h=['DS','TS','LS','ES'].filter(k=>g[k]||S.edit).map(k=>{const[name,col,ico]=B[k],it=g[k]||[];
     return `<section class="bloc ${k==='DS'?'main':''}" data-b="${k}"><div class="bh"><span class="ib" style="background:${col}"><svg viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ico}</svg></span>
@@ -106,7 +125,7 @@ function update(){
   if(S.mode==='bloc'){let w=null;for(const k in per){const p=per[k],sc=p.valid?-99:p.need==null?99:p.need;if(!w||sc>w.s)w={s:sc,k}}if(w){R=per[w.k];which=w.k}}
   const pre=which?`bloc ${which} · `:'',ep=R.phase===1?(R.onlyCC2?'au CC2':'aux CC restants'):'au rattrapage';
   let s='',big='–',sub='',lbl=pre+'note à viser '+ep;
-  if(!all.E){s='done';sub='ajoute des matières pour commencer.'}
+  if(!all.E){s='done';lbl='note à viser';sub='ajoute tes matières et leurs ects pour commencer.'}
   else if(R.valid){s='ok';lbl=pre+(R.phase===2?'moyenne après les CC':'moyenne finale');big=fmt(R.fin)+'<small>/20</small>';sub=`objectif de ${S.target} atteint${R.phase===2?', pas besoin de rattrapage':''}.`}
   else if(R.need==null){s='no';lbl=pre+'moyenne après les CC';big=fmt(R.fin)+'<small>/20</small>';sub=`il manque ${fmt(S.target-R.fin)} point(s). appuie sur « je repasse » pour les matières que tu passes au rattrapage.`}
   else if(R.need<=0){s='ok';big='0<small>/20</small>';sub=`même avec 0 ${ep}, tu atteins ${S.target}.`}
@@ -126,7 +145,9 @@ function sim(){const v=+$('sim').value,a=calc(rows());$('simv').textContent=fmt(
   $('simr').textContent=!a.E?'–':fmt(a.n?a.f(v):(a.fin!=null?a.fin:a.cur||0))+' /20'}
 
 document.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;
-  if(t.dataset.sem){S.sem=t.dataset.sem;S.edit=false}
+  if(t.dataset.go){S.sem=t.dataset.go;view='app';S.edit=!rows().length;window.scrollTo(0,0)}
+  else if(t.id==='licBtn'){view='welcome';window.scrollTo(0,0)}
+  else if(t.dataset.sem){S.sem=t.dataset.sem;S.edit=!rows().length}
   else if(t.dataset.mode)S.mode=t.dataset.mode;
   else if(t.dataset.rule)S.rule=t.dataset.rule;
   else if(t.dataset.t)S.target=+t.dataset.t;
@@ -136,7 +157,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)r
     if(a==='rt')rows()[i].rt=t.getAttribute('aria-pressed')!=='true';
     else if(a==='del')rows().splice(i,1);
     else if(a==='add')rows().push({b:t.closest('[data-b]').dataset.b,n:'nouvelle matière',e:2,c1:'',c2:'',ra:'',rt:null});
-    else if(a==='reset')S.data[S.sem]=fresh(S.sem);
+    else if(a==='reset')S.data[dkey()]=fresh(S.sem);
     else return}
   else return;
   save();render()});
@@ -144,4 +165,5 @@ $('list').addEventListener('input',e=>{const el=e.target,row=el.closest('[data-i
   rows()[+row.dataset.i][el.dataset.f]=el.value;check(el);save();update()});
 $('w1').addEventListener('input',e=>{S.w1=e.target.value;$('w2').textContent=fmt(100-(+String(S.w1).replace(',','.')||0));save();update()});
 $('sim').addEventListener('input',sim);
+$('licSel').addEventListener('change',e=>{S.lic=e.target.value;save();welcome()});
 render();
