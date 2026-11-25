@@ -21,15 +21,20 @@ Calcule la note qu'il te faut au prochain examen pour valider ton semestre à l'
 - La maquette est modifiable : ajouter, renommer, supprimer des matières ou changer leurs ECTS.
 - Les notes restent dans ton navigateur (localStorage), rien n'est envoyé nulle part.
 
-Licences disponibles :
-- **Licence Informatique** : maquette 2025-2026 pré-remplie (L1 à L3, S1 à S6) ;
-- **Autre licence** : maquette vide, tu ajoutes tes matières et leurs ECTS.
+Licences disponibles : 22 licences et parcours tirés des 18 maquettes officielles de licence UPF 2024-2028
+(Informatique : maquette 2025-2026), plus « Autre licence » avec une maquette vide à remplir.
+Les données sont dans `licences.js`, généré à partir des PDF.
 
-Pour ajouter une licence pré-remplie, ajoute une entrée dans l'objet `LIC` de `script.js`.
+Choix faits pour coller au calcul par bloc :
+- une licence par parcours quand les semestres diffèrent (Droit général / Excellence, Économie-gestion MCI / CCA,
+  Sciences de la vie Biologie / Chimie / Environnement avec la majeure de S4 correspondante) ;
+- LAS S2 : le bloc « Santé 2 » (15 ECTS, UE selon la filière) est une seule ligne ;
+- licence pro ERME : chaque UE est un bloc ;
+- LLCER Anglais : la maquette donne 28 et 24 ECTS en L3 ; on a ajouté la LVE (2) en S5 et le stage (6) en S6 pour arriver à 30.
 
 ## Lancer
 
-Trois fichiers (`index.html`, `style.css`, `script.js`), sans dépendance à installer. Ouvre-le dans un navigateur, ou active GitHub Pages (Settings → Pages → branche `main`, dossier `/`).
+Quatre fichiers (`index.html`, `style.css`, `script.js`, `licences.js`), sans dépendance à installer. Ouvre-le dans un navigateur, ou active GitHub Pages (Settings → Pages → branche `main`, dossier `/`).
 
 ## Formule
 

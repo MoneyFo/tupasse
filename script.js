@@ -1,19 +1,22 @@
-const INFO={
- S1:['L1 · S1',[['DS','Logique propositionnelle et des prédicats, algèbre linéaire, arithmétique',4],['DS','Polynômes, raisonnement, récursion, induction, dénombrement',4],['DS',"Initiation à l'informatique de base",2],['DS',"Introduction à l'algorithmique et à la programmation (python)",6],['DS','Application algorithmique (scratch, LARP, Coding Game…)',2],['DS','Programmation web : HTML 5 / CSS',4],['TS','CNB : compétences numériques, bureautique, PIX',3],['ES','Méthodologie de la programmation, versioning, génie logiciel',2],['ES','PREPRO : connaissance de soi',2],['ES','Méthodologie de la recherche documentaire',1]]],
- S2:['L1 · S2',[['DS','Mathématiques pour l’informatique : calcul matriciel',2],['DS','Fonctions, vecteurs, récursivité, tris (python)',6],['DS','Structures de données fondamentales (python)',6],['DS','Programmation C niveau 1',6],['DS','Architecture des ordinateurs, représentation de l’info',4],['TS',"Activité d'ouverture (sport ou transitions)",2],['LS','Anglais',2],['ES','Transitions numériques',2]]],
- S3:['L2 · S3',[['DS','Maths pour l’informatique : analyse matricielle et numérique',4],['DS','Algorithmique niveau 2 : récursivité, tableaux ND',5],['DS','Programmation C niveau 2',5],['DS','Javascript, jQuery',3],['DS','Programmation objet niveau 1 : Java',6],['DS','Système d’exploitation niveau 1 : shell, regex',3],['LS','Anglais',2],['ES','PREPRO : découverte du monde professionnel',2]]],
- S4:['L2 · S4',[['DS','Algorithmique des arbres et des graphes',4],['DS','Système d’exploitation niveau 2 : fork, processus',4],['DS','Bases de données : initiation',4],['DS','Données sur le web : XML, XSLT, XPATH',5],['DS','Programmation web : PHP / MariaDB / AJAX',6],['TS','Expression écrite et certification Voltaire',3],['TS',"Activité d'ouverture",2],['LS','Anglais',2]]],
- S5:['L3 · S5',[['DS','Architecture',3],['DS','Protocoles',5],['DS','Programmation mobile',5],['DS','Programmation par contraintes',5],['DS','Bases de données : conception et notions avancées',4],['TS','Compétences rédactionnelles',2],['LS','Anglais',2],['ES','Génie logiciel',4]]],
- S6:['L3 · S6',[['DS','Automates et théorie des langages',3],['DS','POO niveau 2 : Java, IHM, interfaces graphiques',5],['DS','Programmation mobile niveau 2',4],['DS','Système d’exploitation niveau 3 : communication inter-processus',3],['DS','Sécurité informatique',4],['TS','Transitions (en anglais)',2],['LS','Anglais',2],['ES','Stage en entreprise ou en laboratoire (7 semaines)',6],['ES','PREPRO : insertion dans le milieu professionnel',1]]]
-};
+const INFO=LICENCES.info.P;
 const EMPTY=Object.fromEntries(Object.entries(INFO).map(([k,v])=>[k,[v[0],[]]]));
-const LIC={info:{n:'Licence Informatique',y:'maquette 2025-2026 · 6 semestres pré-remplis',P:INFO},
-  perso:{n:'Autre licence',y:'maquette vide : tu ajoutes tes matières et leurs ects',P:EMPTY}};
+const LIC={...LICENCES,perso:{n:'Autre licence (maquette vide à remplir)',P:EMPTY}};
+// menu des licences, rangées par domaine
+const GROUPS=[['Sciences et technologies',['info','maths','lspi','sv-bio','sv-chimie','sv-env','las','stes']],
+  ['Droit, économie, gestion',['droit','droit-exc','ap','eco-mci','eco-cca']],
+  ['Lettres, langues, sciences humaines',['geo','histoire','lettres','lea-esp','lea-man','llcer-ang','llcer-lp','llcer-pppe']],
+  ['Licence professionnelle',['erme']],['Autre',['perso']]];
 const P=()=>LIC[S.lic]?LIC[S.lic].P:INFO;
 const B={DS:['compétences disciplinaires','var(--teal)','<path d="M8 6 3 12l5 6M16 6l5 6-5 6M14 4l-4 16"/>'],
  TS:['compétences transversales','var(--yellow)','<circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/>'],
  LS:['compétences linguistiques','var(--lav)','<path d="M4 5h16v11H9l-5 4z"/>'],
  ES:['compétences préprofessionnelles','var(--pink)','<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V4h6v3M3 13h18"/>']};
+// bloc : code affiché, intitulé, couleur, icône (blocs propres à une licence : DS-A, UE 1…)
+const PAL=['var(--teal)','var(--yellow)','var(--lav)','var(--pink)','var(--coral)'];
+const BI=k=>{const o=((LIC[S.lic]||{}).blocs||{})[k],d=B[k.slice(0,2)];
+  return{code:o?o[0]:k,name:o?o[1]:(d?d[0]:k),col:d?d[1]:PAL[(parseInt(k.replace(/\D/g,''))||0)%PAL.length],ico:d?d[2]:'<path d="M4 6h16M4 12h16M4 18h10"/>'}};
+const order=()=>{const o=[];for(const r of rows())if(!o.includes(r.b))o.push(r.b);
+  if(S.edit&&!(LIC[S.lic]||{}).blocs)for(const k of ['DS','TS','LS','ES'])if(!o.includes(k))o.push(k);return o};
 const KEY='ma-moyenne-v2',$=id=>document.getElementById(id);
 const fresh=s=>P()[s][1].map(([b,n,e])=>({b,n,e,c1:'',c2:'',ra:'',rt:null}));
 let S=null;try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
@@ -77,7 +80,8 @@ const tag=(need,pre)=>need==null?'':need<=0?'<span class="tag t">déjà ok</span
 
 function welcome(){
   $('calcBtn').disabled=!pick;$('calcBtn').textContent=pick?`calculer mon ${P()[pick][0].split(' · ')[1]} →`:'choisis un semestre';
-  $('licSel').innerHTML=Object.entries(LIC).map(([k,l])=>`<option value="${k}"${k===S.lic?' selected':''}>${esc(l.n)}</option>`).join('');
+  $('licSel').innerHTML=GROUPS.map(([g,ks])=>`<optgroup label="${esc(g)}">${ks.filter(k=>LIC[k]).map(k=>`<option value="${k}"${k===S.lic?' selected':''}>${esc(LIC[k].n)}</option>`).join('')}</optgroup>`).join('');
+  if(pick&&!P()[pick])pick=null;
   const yrs={};for(const k of Object.keys(P())){const y=P()[k][0].split(' · ')[0];(yrs[y]=yrs[y]||[]).push(k)}
   const col={L1:'var(--teal)',L2:'var(--lav)',L3:'var(--pink)'};
   $('semGrid').innerHTML=Object.entries(yrs).map(([y,ks])=>`<div class="yr"><b>${y}</b>${ks.map(k=>{const n=(S.data[S.lic+':'+k]||P()[k][1]).length;
@@ -93,11 +97,11 @@ function render(){
   $('editBtn').classList.toggle('on',S.edit);$('editBtn').textContent=S.edit?'terminer':'modifier la maquette';
   $('sample').hidden=!(S.sample&&S.lic==='info'&&S.sem==='S1');
   const g=groups();
-  let h=['DS','TS','LS','ES'].filter(k=>g[k]||S.edit).map(k=>{const[name,col,ico]=B[k],it=g[k]||[];
-    return `<section class="bloc ${k==='DS'?'main':''}" data-b="${k}"><div class="bh"><span class="ib" style="background:${col}"><svg viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ico}</svg></span>
-      <div><h2>${k} · ${name}</h2><small data-tot="${k}"></small></div><span class="need" data-bneed="${k}"></span></div>
+  let h=order().map((k,bi)=>{const{code,name,col,ico}=BI(k),it=g[k]||[];
+    return `<section class="bloc ${bi===0?'main':''}" data-b="${esc(k)}"><div class="bh"><span class="ib" style="background:${col}"><svg viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ico}</svg></span>
+      <div><h2>${esc(code)} · ${esc(name)}</h2><small data-tot="${esc(k)}"></small></div><span class="need" data-bneed="${esc(k)}"></span></div>
       ${it.map(([r,i])=>S.edit?`<div class="row edit-row" data-i="${i}"><input class="in wide" data-f="n" value="${esc(r.n)}" aria-label="nom de la matière"><input class="in sm" data-f="e" inputmode="decimal" value="${esc(r.e)}" aria-label="ects"><button class="mini" data-act="del" aria-label="supprimer">×</button></div>`
-      :`<div class="row${r.va?' acq':''}" data-i="${i}"><div><div class="nm">${esc(r.n)}</div><div class="meta"><span class="ects">${esc(r.e)} ects</span><span data-chip></span></div></div>
+      :`<div class="row${r.va?' acq':''}" data-i="${i}"><div><div class="nm">${esc(r.n)}</div><div class="meta"><span class="ects">${fmt(ects(r))} ects</span><span data-chip></span></div></div>
         <div class="fields">${r.va?'':`
           <label class="f">cc1<input class="in" data-f="c1" inputmode="decimal" placeholder="?" value="${esc(r.c1)}"></label>
           <label class="f">cc2<input class="in" data-f="c2" inputmode="decimal" placeholder="?" value="${esc(r.c2)}"></label>
@@ -115,9 +119,9 @@ function check(el){const f=el.dataset.f;if(f==='n')return;const v=el.value,x=par
 function short(p){return !p.E?'acquis':p.valid?'validé':p.need==null?(p.phase===2?'à rattraper':'–'):p.need<=0?'déjà ok':p.need>20?'&gt; 20':`vise ${fmt(ceil(p.need))}${p.phase===2?' (ratt.)':''}`}
 function update(){
   const all=calc(rows()),g=groups(),per={};for(const k in g)per[k]=calc(g[k].map(x=>x[0]));
-  for(const k in B){const t=document.querySelector(`[data-tot="${k}"]`),p=per[k];
+  for(const k of order()){const t=document.querySelector(`[data-tot="${CSS.escape(k)}"]`),p=per[k];
     if(t&&p)t.textContent=`${fmt(g[k].reduce((s,[r])=>s+ects(r),0))} ects`+(p.cur!=null?` · moyenne ${fmt(p.cur)}`:'');
-    const n=document.querySelector(`[data-bneed="${k}"]`);if(n)n.innerHTML=p&&!S.edit&&(p.valid||!p.E)?`<span class="tag t">${short(p)}</span>`:''}
+    const n=document.querySelector(`[data-bneed="${CSS.escape(k)}"]`);if(n)n.innerHTML=p&&!S.edit&&(p.valid||!p.E)?`<span class="tag t">${short(p)}</span>`:''}
   document.querySelectorAll('#list .row[data-i]').forEach(el=>{const r=rows()[el.dataset.i],c=el.querySelector('[data-chip]'),bt=el.querySelector('[data-act=rt]');if(!c)return;
     if(r.va){c.innerHTML='<span class="tag t">acquise · hors calcul</span>';return}
     const G=per[r.b],avg=ccAvg(r);
@@ -129,7 +133,7 @@ function update(){
   let R=null,which='',w=null;
   for(const k in per){const p=per[k];if(!p.E)continue;const sc=p.valid?-99:p.need==null?99:p.need;if(!w||sc>w.s)w={s:sc,k}}
   if(w){R=per[w.k];which=w.k}
-  const pre=which?`bloc ${which} · `:'',ep=R&&R.phase===1?(R.onlyCC2?'au CC2':'aux CC restants'):'au rattrapage';
+  const pre=which?`bloc ${BI(which).code} · `:'',ep=R&&R.phase===1?(R.onlyCC2?'au CC2':'aux CC restants'):'au rattrapage';
   let s='',big='–',sub='',lbl=pre+'note à viser '+ep;
   if(!R){s='done';lbl='note à viser';sub=rows().length?'toutes les matières sont déjà validées.':'ajoute tes matières et leurs ects pour commencer.'}
   else if(R.valid){s='ok';lbl='tous les blocs';big='validé';sub='chaque bloc a déjà 10 de moyenne'+(R.phase===2?', pas besoin de rattrapage.':'.')}
@@ -139,8 +143,8 @@ function update(){
   else{const n=ceil(R.need);s=n<=10?'':n<=14?'mid':'hard';big=fmt(n)+'<small>/20</small>';
     sub=(R.phase===1?`sur chacun des ${R.n} CC qui restent dans ce bloc`:`sur chacune des ${R.n} matière(s) repassée(s) de ce bloc`)+`, pour qu’il ait 10. c’est le bloc le plus serré.`}
   const card=$('card');card.dataset.s=s;$('lbl').textContent=lbl;$('big').innerHTML=big;$('big').classList.toggle('long',big.replace(/<small>.*$/,'').length>4);$('sub').textContent=sub;
-  $('bl').innerHTML=['DS','TS','LS','ES'].filter(k=>per[k]).map(k=>{const p=per[k];
-    return `<div><span class="bk" style="--c:${B[k][1]}">${k}</span><span class="bm">${p.cur!=null?'moyenne '+fmt(p.cur):p.E?'pas encore de note':'matières acquises'}</span><span class="bs">${short(p)}</span></div>`}).join('');
+  $('bl').innerHTML=order().filter(k=>per[k]).map(k=>{const p=per[k],bi=BI(k);
+    return `<div><span class="bk" style="--c:${bi.col}">${esc(bi.code)}</span><span class="bm">${p.cur!=null?'moyenne '+fmt(p.cur):p.E?'pas encore de note':'matières acquises'}</span><span class="bs">${short(p)}</span></div>`}).join('');
 }
 document.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;
   if(t.dataset.go){pick=t.dataset.go;welcome();return}

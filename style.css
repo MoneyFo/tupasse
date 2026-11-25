@@ -147,7 +147,7 @@ body[data-view=welcome] .wrap{padding-bottom:16px}
 .sel{margin-bottom:26px}
 .bl{gap:8px;margin-top:4px}
 .bl div{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;padding:8px 10px}
-.bl .bk{display:inline-grid;place-items:center;min-width:38px;height:28px;border:2px solid #111;border-radius:999px;font-weight:800;font-size:13px;background:var(--c)}
+.bl .bk{display:inline-grid;place-items:center;min-width:38px;padding:0 8px;white-space:nowrap;height:28px;border:2px solid #111;border-radius:999px;font-weight:800;font-size:13px;background:var(--c)}
 .bl .bm{color:#555;font-size:13.5px}
 .bl .bs{font-weight:800;white-space:nowrap}
 .mini.va[aria-pressed=true]{background:var(--teal);color:#111}
