@@ -16,7 +16,7 @@ Maquette fournie par défaut : Licence Informatique 2025-2026 (L1 à L3, S1 à S
 
 ## Lancer
 
-C'est un seul fichier, `index.html`, sans dépendance à installer. Ouvre-le dans un navigateur, ou active GitHub Pages (Settings → Pages → branche `main`, dossier `/`).
+Trois fichiers (`index.html`, `style.css`, `script.js`), sans dépendance à installer. Ouvre-le dans un navigateur, ou active GitHub Pages (Settings → Pages → branche `main`, dossier `/`).
 
 ## Formule
 
