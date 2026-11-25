@@ -1,6 +1,6 @@
 # tupasse
 
-Calcule la note qu'il te faut au prochain examen pour valider ton semestre.
+https://moneyfo.github.io/tupasse/
 
 Choisis ta licence, puis ton semestre.
 
@@ -22,7 +22,8 @@ Choisis ta licence, puis ton semestre.
 - Les notes restent dans ton navigateur (localStorage), rien n'est envoyé nulle part.
 
 Licences disponibles : 22 licences et parcours tirés des 18 maquettes officielles de licence UPF 2024-2028
-(Informatique : maquette 2025-2026), plus « Autre licence » avec une maquette vide à remplir.
+« Autre licence » avec une maquette vide à remplir.
+
 Les données sont dans `licences.js`, généré à partir des PDF.
 
 Choix faits pour coller au calcul par bloc :
