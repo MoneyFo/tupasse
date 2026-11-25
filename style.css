@@ -74,7 +74,7 @@ button,input{font:inherit;color:inherit}
 .add{display:block;width:calc(100% - 32px);margin:4px 16px 14px;min-height:44px;border:2px dashed var(--line);border-radius:8px;background:none;font-weight:700;cursor:pointer}
 .add:hover{background:var(--bg)}
 /* result */
-.res{position:sticky;top:96px}
+.res{position:sticky;top:24px}
 .card{position:relative;border:var(--b);border-radius:14px;box-shadow:var(--sh-lg);padding:22px;color:#111;background:var(--lav);transition:background .25s}
 .card[data-s=ok]{background:var(--teal)}.card[data-s=mid]{background:var(--yellow)}.card[data-s=hard]{background:var(--coral)}.card[data-s=no]{background:var(--pink)}.card[data-s=done]{background:#fff}
 .lbl{font-weight:700;font-size:15px}
