@@ -17,7 +17,7 @@ const B={DS:['compétences disciplinaires','var(--teal)','<path d="M8 6 3 12l5 6
 const KEY='ma-moyenne-v2',$=id=>document.getElementById(id);
 const fresh=s=>P()[s][1].map(([b,n,e])=>({b,n,e,c1:'',c2:'',ra:'',rt:null}));
 let S=null;try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
-if(!S||!S.data){S={lic:'info',sem:'S1',target:10,mode:'sem',rule:'max',w1:50,edit:false,sample:true,data:{}};
+if(!S||!S.data){S={lic:'info',sem:'S1',target:10,mode:'sem',rule:'max',edit:false,sample:true,data:{}};
   const r=fresh('S1'),c1=[9,8,11,10,12,8,13,12,11,14],c2={1:7,3:10,6:12,7:11,8:12,9:15};
   r.forEach((x,i)=>{x.c1=String(c1[i]);if(c2[i]!=null)x.c2=String(c2[i])});S.data.S1=r}
 if(!LIC[S.lic])S.lic='info';
@@ -36,7 +36,7 @@ const fmt=x=>{const v=Math.trunc(milli(x))/1000;return v.toFixed(3).replace('.',
 const ceil=x=>Math.ceil(milli(x))/1000;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const ects=r=>Math.max(+String(r.e).replace(',','.')||0,0);
-const wts=()=>{const a=Math.min(Math.max(+String(S.w1).replace(',','.')||0,0),100)/100;return[a,1-a]};
+const wts=()=>[.5,.5]; // CC1 et CC2 comptent pareil
 const ccAvg=r=>{const[a,b]=wts(),x=num(r.c1),y=num(r.c2);return ok(x)&&ok(y)?a*x+b*y:null};
 // note de la matière une fois le rattrapage connu, selon la règle choisie
 const rated=(r,ra)=>{const m=ccAvg(r);if(!ok(ra)||m==null)return m;const[a,b]=wts(),x=num(r.c1),y=num(r.c2);
@@ -90,7 +90,6 @@ function render(){
   $('crumb').textContent=LIC[S.lic].n.toLowerCase()+' · '+yr;
   $('semTitle').textContent=`semestre ${se.slice(1)}`;
   document.querySelectorAll('[data-rule]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.rule===S.rule));
-  $('w1').value=S.w1;$('w2').textContent=fmt(100-(+String(S.w1).replace(',','.')||0));
   $('editBtn').classList.toggle('on',S.edit);$('editBtn').textContent=S.edit?'terminer':'modifier la maquette';
   $('sample').hidden=!(S.sample&&S.lic==='info'&&S.sem==='S1');
   const g=groups();
@@ -140,7 +139,6 @@ function update(){
   else{const n=ceil(R.need);s=n<=10?'':n<=14?'mid':'hard';big=fmt(n)+'<small>/20</small>';
     sub=(R.phase===1?`sur chacun des ${R.n} CC qui restent dans ce bloc`:`sur chacune des ${R.n} matière(s) repassée(s) de ce bloc`)+`, pour qu’il ait 10. c’est le bloc le plus serré.`}
   const card=$('card');card.dataset.s=s;$('lbl').textContent=lbl;$('big').innerHTML=big;$('big').classList.toggle('long',big.replace(/<small>.*$/,'').length>4);$('sub').textContent=sub;
-  $('mobl').textContent=lbl;$('mobv').innerHTML=big;$('mob').style.background=getComputedStyle(card).backgroundColor;
   $('bl').innerHTML=['DS','TS','LS','ES'].filter(k=>per[k]).map(k=>{const p=per[k];
     return `<div><span class="bk" style="--c:${B[k][1]}">${k}</span><span class="bm">${p.cur!=null?'moyenne '+fmt(p.cur):p.E?'pas encore de note':'matières acquises'}</span><span class="bs">${short(p)}</span></div>`}).join('');
 }
@@ -162,6 +160,5 @@ document.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)r
   save();render()});
 $('list').addEventListener('input',e=>{const el=e.target,row=el.closest('[data-i]');if(!row||!el.dataset.f)return;
   rows()[+row.dataset.i][el.dataset.f]=el.value;check(el);save();update()});
-$('w1').addEventListener('input',e=>{S.w1=e.target.value;$('w2').textContent=fmt(100-(+String(S.w1).replace(',','.')||0));save();update()});
 $('licSel').addEventListener('change',e=>{S.lic=e.target.value;save();welcome()});
 render();

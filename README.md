@@ -10,7 +10,7 @@ Calcule la note qu'il te faut au prochain examen pour valider ton semestre à l'
   Le site affiche la moyenne de chaque bloc et la note à avoir **sur chaque épreuve restante** du bloc le plus serré.
 - Bouton **« validée ? »** sur chaque matière : pour une matière déjà acquise (redoublement).
   Elle sort du calcul : sa note ne compte pas.
-- Chaque matière a **2 CC** (poids réglable, 50/50 par défaut) et **1 rattrapage**.
+- Chaque matière a **2 CC** (qui comptent pareil, 50/50) et **1 rattrapage**.
 - Tant qu'il reste des CC à passer, le site donne la note à viser au(x) CC restant(s).
   Quand tous les CC sont notés et que le semestre n'est pas validé, il donne la note à viser au rattrapage
   (matières sous 10 cochées « je repasse » par défaut, modifiable).
@@ -33,7 +33,7 @@ Trois fichiers (`index.html`, `style.css`, `script.js`), sans dépendance à ins
 
 ## Formule
 
-Note d'une matière = `poids CC1 × CC1 + poids CC2 × CC2`, puis la règle de rattrapage choisie.
+Note d'une matière = `(CC1 + CC2) / 2`, puis la règle de rattrapage choisie.
 Moyenne d'un bloc = `Σ (ECTS × note de la matière) / Σ ECTS`.
 
 La note à viser est la plus petite note `x`, la même sur toutes les épreuves restantes, qui donne une moyenne ≥ objectif.

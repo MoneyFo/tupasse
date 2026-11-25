@@ -2,7 +2,7 @@
    IDEA: un relevé de notes façon zine, découpé et collé, avec la note à viser tamponnée à côté
    PICTURE: la carte résultat, énorme chiffre /20, jauge et simulateur, qui change de couleur selon l'effort
    COLOUR and TYPE: crème #FAFADF, bordures #111, corail/lavande/menthe/jaune/rose ; DM Sans 800 + Caveat
-   LAYOUT: nav flottante, matières par bloc à gauche, résultat collant à droite ; mobile : barre résultat en bas */
+   LAYOUT: nav flottante, matières par bloc à gauche, résultat collant à droite  */
 :root{color-scheme:light dark;
   --bg:light-dark(#FAFADF,#16151a);--surface:light-dark(#fff,#222128);--ink:light-dark(#111,#f4f2e6);
   --muted:light-dark(#555,#b9b6a8);--line:light-dark(#111,#f4f2e6);
@@ -14,7 +14,7 @@
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 var(--font);overflow-x:clip}
 h1,h2,h3{margin:0;line-height:1.1;letter-spacing:-.01em}
 button,input{font:inherit;color:inherit}
-.wrap{max-width:1120px;margin:0 auto;padding:16px max(4vw,14px) 120px;position:relative}
+.wrap{max-width:1120px;margin:0 auto;padding:16px max(4vw,14px) 48px;position:relative}
 .deco{position:absolute;pointer-events:none;z-index:0}
 .spin{animation:spin 14s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
 /* nav */
@@ -102,10 +102,8 @@ input[type=range]{width:100%;accent-color:var(--purple);height:30px}
 .bl div{display:flex;justify-content:space-between;gap:8px;background:#fff;border:2px solid #111;border-radius:8px;padding:6px 10px;font-weight:600;font-size:14px}
 .sample{font-size:13.5px;color:var(--muted);margin:-8px 0 16px}
 .foot{margin-top:30px;color:var(--muted);font-size:13.5px;max-width:70ch}
-.mob{display:none}
 @media(max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}.res{position:static}
-  .mob{display:flex;position:fixed;left:12px;right:12px;bottom:12px;z-index:60;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border:2px solid #111;border-radius:12px;box-shadow:4px 4px 0 #111;background:var(--lav);color:#111;font-weight:700}
-  .mob strong{font-size:26px;font-weight:800}}
+}
 @media(max-width:600px){.hideM{display:none}.row{grid-template-columns:minmax(0,1fr)}.fields{justify-content:flex-start}.edit-row{grid-template-columns:minmax(0,1fr) 64px 44px}.head{padding-top:30px}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 .rule{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font-weight:600;font-size:14.5px;margin-bottom:12px}
@@ -141,7 +139,7 @@ input[type=range]{width:100%;accent-color:var(--purple);height:30px}
 .calc:active:not(:disabled){transform:translate(4px,4px);box-shadow:none}
 .calc:disabled{background:var(--bg);color:var(--muted);cursor:not-allowed;box-shadow:none;border-style:dashed}
 .crumb{font-weight:700;font-size:14.5px;color:var(--muted);margin:0}
-body[data-view=welcome] .nav,body[data-view=welcome] .head,body[data-view=welcome] .grid,body[data-view=welcome] .mob,body[data-view=welcome] .wrap>.deco{display:none}
+body[data-view=welcome] .nav,body[data-view=welcome] .head,body[data-view=welcome] .grid,body[data-view=welcome] .wrap>.deco{display:none}
 body[data-view=app] .welcome{display:none}
 body[data-view=welcome] .wrap{padding-bottom:16px}
 
@@ -156,3 +154,5 @@ body[data-view=welcome] .wrap{padding-bottom:16px}
 .row.acq{background:light-dark(#f1fbf9,#1f2a29)}
 .row.acq .nm{text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:var(--teal)}
 .big.long{font-size:clamp(48px,5.8vw,72px)}
+.panel .foot{margin:16px 0 0;font-size:13px;line-height:1.5;padding-top:14px;border-top:1.5px dashed light-dark(#cfcdb9,#4a4852)}
+@media(max-width:900px){.res{display:contents}#card{order:-1}.res .panel{order:2}}
