@@ -128,12 +128,20 @@ input[type=range]{width:100%;accent-color:var(--purple);height:30px}
 .semgrid{display:grid;gap:12px}
 .yr{display:grid;grid-template-columns:44px minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:center}
 .yr b{font-size:15px;font-weight:800}
-.go{min-height:56px;border:var(--b);border-radius:var(--r);box-shadow:var(--sh);font-weight:800;font-size:17px;color:#111;cursor:pointer;transition:transform .1s,box-shadow .1s}
+.go{min-height:56px;background:var(--c);border:var(--b);border-radius:var(--r);box-shadow:var(--sh);font-weight:800;font-size:17px;color:#111;cursor:pointer;transition:transform .1s,box-shadow .1s}
 .go:hover{transform:translate(2px,2px);box-shadow:var(--sh-md-hover,2px 2px 0 var(--line))}
 .go:active{transform:translate(4px,4px);box-shadow:none}
 .go small{display:block;font-size:12.5px;font-weight:600;opacity:.75}
-.go[aria-current=true]{outline:3px dashed var(--line);outline-offset:3px}
+.go[aria-checked=true],.go[aria-checked=true]:hover{background:var(--coral);color:#fff;transform:translate(4px,4px);box-shadow:none}
+.go[aria-checked=true] small{opacity:1}
+.go[aria-checked=true]::before{content:'✓ '}
+.go:focus-visible,.calc:focus-visible{outline:3px solid var(--purple);outline-offset:3px}
+.calc{display:block;width:100%;margin-top:22px;min-height:56px;border:var(--b);border-radius:999px;background:var(--coral);color:#fff;font:800 18px var(--font);box-shadow:var(--sh);cursor:pointer;transition:transform .1s,box-shadow .1s}
+.calc:hover:not(:disabled){transform:translate(2px,2px);box-shadow:2px 2px 0 var(--line)}
+.calc:active:not(:disabled){transform:translate(4px,4px);box-shadow:none}
+.calc:disabled{background:var(--bg);color:var(--muted);cursor:not-allowed;box-shadow:none;border-style:dashed}
+.crumb{font-weight:700;font-size:14.5px;color:var(--muted);margin:0}
 body[data-view=welcome] .nav,body[data-view=welcome] .head,body[data-view=welcome] .grid,body[data-view=welcome] .mob,body[data-view=welcome] .wrap>.deco{display:none}
 body[data-view=app] .welcome{display:none}
 body[data-view=welcome] .wrap{padding-bottom:16px}
-@media(max-width:600px){.navr{width:100%}.btn.lic{width:100%;justify-content:center}}
+

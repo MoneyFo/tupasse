@@ -2,7 +2,7 @@
 
 Calcule la note qu'il te faut au prochain examen pour valider ton semestre à l'université.
 
-À l'arrivée, tu choisis ta licence dans un menu déroulant, puis ton semestre. Le bouton « changer » en haut ramène à ce choix.
+À l'arrivée, tu choisis ta licence dans un menu déroulant, puis ton semestre, et tu cliques sur **calculer**. La page suivante ne montre que ce semestre ; le bouton « changer de semestre » en haut ramène au choix.
 
 - Les **ECTS servent de coefficients** (une matière à 5 ECTS compte 5 fois).
 - Tu remplis les notes que tu as déjà. Ce qui reste à passer, tu le laisses vide.

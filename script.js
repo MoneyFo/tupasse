@@ -25,7 +25,7 @@ if(!LIC[S.lic])S.lic='info';
 for(const k of Object.keys(S.data))if(!k.includes(':')){S.data['info:'+k]=S.data[k];delete S.data[k]}
 const dkey=()=>S.lic+':'+S.sem;
 const rows=()=>S.data[dkey()]||(S.data[dkey()]=fresh(S.sem));
-let view='welcome';
+let view='welcome',pick=S.chosen?S.sem:null;
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 const num=v=>{if(v==null||String(v).trim()==='')return null;const x=parseFloat(String(v).replace(',','.'));return isFinite(x)&&x>=0&&x<=20?x:NaN};
 const ok=x=>x!=null&&!isNaN(x);
@@ -72,18 +72,20 @@ const groups=()=>{const g={};rows().forEach((r,i)=>(g[r.b]=g[r.b]||[]).push([r,i
 const tag=(need,pre)=>need==null?'':need<=0?'<span class="tag t">déjà ok</span>':need>20?'<span class="tag p">&gt; 20</span>':`<span class="tag y">${pre} ${fmt(ceil(need))}</span>`;
 
 function welcome(){
+  $('calcBtn').disabled=!pick;$('calcBtn').textContent=pick?`calculer mon ${P()[pick][0].split(' · ')[1]} →`:'choisis un semestre';
   $('licSel').innerHTML=Object.entries(LIC).map(([k,l])=>`<option value="${k}"${k===S.lic?' selected':''}>${esc(l.n)}</option>`).join('');
   $('licSub').textContent=LIC[S.lic].y;
   const yrs={};for(const k of Object.keys(P())){const y=P()[k][0].split(' · ')[0];(yrs[y]=yrs[y]||[]).push(k)}
   const col={L1:'var(--teal)',L2:'var(--lav)',L3:'var(--pink)'};
   $('semGrid').innerHTML=Object.entries(yrs).map(([y,ks])=>`<div class="yr"><b>${y}</b>${ks.map(k=>{const n=(S.data[S.lic+':'+k]||P()[k][1]).length;
-    return `<button class="go" data-go="${k}" style="background:${col[y]||'var(--yellow)'}" aria-current="${k===S.sem}">${P()[k][0].split(' · ')[1]}<small>${n?n+' matières':'à remplir'}</small></button>`}).join('')}</div>`).join('');
+    return `<button class="go" role="radio" data-go="${k}" style="--c:${col[y]||'var(--yellow)'}" aria-checked="${k===pick}">${P()[k][0].split(' · ')[1]}<small>${n?n+' matières':'à remplir'}</small></button>`}).join('')}</div>`).join('');
 }
 function render(){
   document.body.dataset.view=view;
   if(view==='welcome'){welcome();return}
-  $('licBtn').textContent=LIC[S.lic].n+' · changer';
-  $('tabs').innerHTML=Object.keys(P()).map(k=>`<button class="tab" data-sem="${k}" aria-pressed="${k===S.sem}">${P()[k][0]}</button>`).join('');
+  const[yr,se]=P()[S.sem][0].split(' · ');
+  $('crumb').textContent=LIC[S.lic].n.toLowerCase()+' · '+yr;
+  $('semTitle').innerHTML=`<span class="hl">semestre ${esc(se.slice(1))}</span>`;
   document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===S.mode));
   document.querySelectorAll('[data-rule]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.rule===S.rule));
   $('w1').value=S.w1;$('w2').textContent=fmt(100-(+String(S.w1).replace(',','.')||0));
@@ -145,9 +147,9 @@ function sim(){const v=+$('sim').value,a=calc(rows());$('simv').textContent=fmt(
   $('simr').textContent=!a.E?'–':fmt(a.n?a.f(v):(a.fin!=null?a.fin:a.cur||0))+' /20'}
 
 document.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;
-  if(t.dataset.go){S.sem=t.dataset.go;view='app';S.edit=!rows().length;window.scrollTo(0,0)}
-  else if(t.id==='licBtn'){view='welcome';window.scrollTo(0,0)}
-  else if(t.dataset.sem){S.sem=t.dataset.sem;S.edit=!rows().length}
+  if(t.dataset.go){pick=t.dataset.go;welcome();return}
+  else if(t.id==='calcBtn'){if(!pick)return;S.sem=pick;S.chosen=true;view='app';S.edit=!rows().length;window.scrollTo(0,0)}
+  else if(t.id==='licBtn'){view='welcome';pick=S.sem;window.scrollTo(0,0)}
   else if(t.dataset.mode)S.mode=t.dataset.mode;
   else if(t.dataset.rule)S.rule=t.dataset.rule;
   else if(t.dataset.t)S.target=+t.dataset.t;

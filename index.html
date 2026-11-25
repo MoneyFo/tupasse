@@ -21,10 +21,7 @@
 
   <nav class="nav">
     <div class="logo"><i>/20</i>ma moyenne</div>
-    <div class="navr">
-      <button class="btn lic" id="licBtn" title="changer de licence ou de semestre"></button>
-      <div class="tabs" id="tabs" role="group" aria-label="semestre"></div>
-    </div>
+    <button class="btn lic" id="licBtn">← changer de semestre</button>
   </nav>
 
   <section class="welcome" id="welcome" aria-label="choix de la licence et du semestre">
@@ -33,23 +30,21 @@
       <select id="licSel" class="sel"></select>
       <p class="wsub" id="licSub"></p>
       <div class="step"><span class="num">2</span><span>ton semestre</span></div>
-      <div class="semgrid" id="semGrid"></div>
+      <div class="semgrid" id="semGrid" role="radiogroup" aria-label="semestre"></div>
+      <button class="calc" id="calcBtn" disabled>calculer</button>
       <p class="note" style="margin:16px 0 0;transform:rotate(-1.5deg)">tes notes restent dans ton navigateur ✦</p>
     </div>
   </section>
 
   <header class="head">
-    <h1>combien il te faut au <span class="hl">prochain exam</span> ?</h1>
-    <p>les ects comptent comme coefficients. remplis les notes que tu as déjà, laisse vide ce qui reste à passer : on te dit la note à viser pour valider.</p>
+    <p class="crumb" id="crumb"></p>
+    <h1 id="semTitle"></h1>
+    <p>remplis les notes que tu as déjà, laisse vide ce qui reste à passer : on te dit la note à viser pour valider. les ects comptent comme coefficients.</p>
   </header>
 
   <div class="grid">
     <main>
       <div class="bar">
-        <div class="seg" role="group" aria-label="mode de calcul">
-          <button data-mode="sem">un seul bloc (semestre)</button>
-          <button data-mode="bloc">chaque bloc séparément</button>
-        </div>
         <button class="btn" id="editBtn">modifier la maquette</button>
         <button class="btn" id="clearBtn">vider les notes</button>
       </div>
@@ -82,6 +77,8 @@
       <div class="panel">
         <h3>règles de calcul</h3>
         <div class="rule"><label for="w1">poids du CC1</label><span><input class="in sm" id="w1" inputmode="decimal"> % · CC2 <b id="w2">50</b> %</span></div>
+        <div class="rule col" style="margin-bottom:14px"><span>les blocs…</span>
+          <div class="pills" role="group" aria-label="mode de calcul"><button class="pill" data-mode="sem">se compensent (un seul bloc)</button><button class="pill" data-mode="bloc">doivent chacun avoir la moyenne</button></div></div>
         <div class="rule col"><span>le rattrapage…</span>
           <div class="pills" role="group" aria-label="règle du rattrapage">
             <button class="pill" data-rule="max">remplace la moyenne des CC s'il est meilleur</button>
