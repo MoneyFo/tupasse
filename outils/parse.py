@@ -14,6 +14,8 @@ def parse(path):
     parc, bloc, hx, ex = '', None, 60, 140
     last = None  # dernière matière ajoutée (pour les noms sur 2 lignes)
     skip = -1
+    owner = None
+    owner_opts = {}
 
     def textonly(s):
         t = s.strip()
@@ -34,6 +36,7 @@ def parse(path):
             be = [n for n, e in nums if abs(e - ex) <= 5]
             checks.append((parc, int(bm.group(2)), bloc, be[-1] if be else None))
             last = None
+            owner = None
             continue
         if i == skip:
             continue
@@ -44,6 +47,13 @@ def parse(path):
             continue
         sem, suf = int(cm.group(2)), cm.group(4)
         if suf:
+            # option d'une matière à choix (2.6.a Sport, 5.8.b Re'o Mā'ohi ou…)
+            if owner is not None:
+                cut = [x.start() for x in num_re.finditer(line) if x.start() >= hx - 8]
+                on = line[cm.end():cut[0] if cut else len(line)].strip()
+                on = re.sub(r'\s*\*\s*', ' ', re.sub(r'\s+ou$', '', on)).strip()
+                if on and 'facultati' not in on.lower():
+                    owner_opts.setdefault(id(owner), (owner, []))[1].append(on)
             last = None
             continue
         rest_start = cm.end()
@@ -79,14 +89,20 @@ def parse(path):
                     break
         if 'facultati' in name.lower() or not ects:
             last = None
+            owner = None
             continue
         e = float(ects[-1].replace(',', '.'))
         if e <= 0:
             last = None
+            owner = None
             continue
         row = [bloc, name, e]
         out.setdefault(parc, {}).setdefault(sem, []).append(row)
         last = row
+        owner = row
+    for row, opts in owner_opts.values():
+        if len(opts) >= 2:
+            row.append(opts)
     return out, checks
 
 def report(res_only=False):
@@ -102,7 +118,7 @@ def report(res_only=False):
             for s, rows in sorted(sems.items()):
                 tot = sum(r[2] for r in rows)
                 byb = {}
-                for b, _, e in rows:
+                for b, _, e, *_ in rows:
                     byb[b] = byb.get(b, 0) + e
                 exp = {c[2]: c[3] for c in checks if c[0] == parc and c[1] == s}
                 bad = {b: (byb.get(b, 0), exp[b]) for b in exp if exp[b] and float(exp[b].replace(',', '.')) != byb.get(b, 0)}

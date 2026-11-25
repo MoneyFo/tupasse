@@ -10,14 +10,19 @@ Choisis ta licence, puis ton semestre.
   Le site affiche la moyenne de chaque bloc et la note à avoir **sur chaque épreuve restante** du bloc le plus serré.
 - Bouton **« validée ? »** sur chaque matière : pour une matière déjà acquise (redoublement).
   Elle sort du calcul : sa note ne compte pas.
-- Chaque matière a **2 CC** (qui comptent pareil, 50/50) et **1 rattrapage**.
+- Chaque matière a **1 à 6 CC** (2 par défaut, qui comptent pareil) et **1 rattrapage**. Le nombre se règle par matière (menu « épreuves », « 1 note » pour un stage ou un examen unique) ou pour tout le semestre (règles de calcul).
 - Tant qu'il reste des CC à passer, le site donne la note à viser au(x) CC restant(s).
   Quand tous les CC sont notés et que le semestre n'est pas validé, il donne la note à viser au rattrapage
   (bouton « rattrapage ? » sur chaque matière ; celles sous 10 sont cochées par défaut).
 - Trois règles de rattrapage au choix :
   - il remplace la moyenne des CC s'il est meilleur ;
-  - il remplace le plus faible des 2 CC ;
-  - on fait la moyenne des 3 notes (CC1, CC2, rattrapage).
+  - il remplace le CC le plus faible ;
+  - on fait la moyenne des CC et du rattrapage.
+- **Compensation annuelle** (option) : chaque bloc est calculé sur les deux semestres de l'année (S1 + S2, S3 + S4, S5 + S6).
+- **Matières à choix** (activité d'ouverture, option, LVE…) : un menu sous la matière pour indiquer ce que tu as pris.
+- **Sauvegarder / restaurer** : un code à copier pour retrouver ses notes sur un autre appareil.
+- **Une erreur dans la maquette ?** ouvre une issue GitHub pré-remplie avec la licence et le semestre.
+- Thème auto / clair / sombre (bouton dans le pied de page).
 - La maquette est modifiable : ajouter, renommer, supprimer des matières ou changer leurs ECTS.
 - Les notes restent dans ton navigateur (localStorage), rien n'est envoyé nulle part.
 

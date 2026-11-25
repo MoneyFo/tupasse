@@ -8,6 +8,9 @@ YEAR = {1: 'L1', 2: 'L1', 3: 'L2', 4: 'L2', 5: 'L3', 6: 'L3'}
 
 def clean(n):
     n = re.sub(r'\s*\*\s*', ' ', n)
+    n = re.sub(r'^Activités? d.ouverture.*$', "Activité d'ouverture", n)
+    n = re.sub(r'\s*\((au choix|option obligatoire)\)\s*:?$', '', n)
+    n = re.sub(r'\s*:$', '', n)
     n = re.sub(r'\s*\(l’UE « Sport ».*$', '', n)
     n = re.sub(r'\s+étudiants$', '', n)
     n = re.sub(r'\s+\d+(,\d+)?$', '', n) if re.search(r'\s(18|24|12|30|36)$', n) else n
@@ -15,13 +18,24 @@ def clean(n):
     n = re.sub(r'\s{2,}', ' ', n).strip()
     return n[:1].upper() + n[1:]
 
+def opt(o):
+    o = re.sub(r'\s+(OU|ou)$', '', o.strip())
+    return o[:1].upper() + o[1:]
+
+def row(r):
+    b, n, e = r[:3]
+    out = [b, clean(n), e]
+    if len(r) > 3:
+        out.append([opt(o) for o in r[3]])
+    return out
+
 def sems(src, only=None):
     """{'5': rows} -> {'S5': ['L3 · S5', rows]}"""
     out = {}
     for k in sorted(src, key=int):
         if only and int(k) not in only:
             continue
-        out['S' + k] = [f'{YEAR[int(k)]} · S{k}', [[b, clean(n), e] for b, n, e in src[k]]]
+        out['S' + k] = [f'{YEAR[int(k)]} · S{k}', [row(r) for r in src[k]]]
     return out
 
 def g(f, parc):
@@ -32,6 +46,12 @@ def insert_after(rows, after_name, row):
     rows.insert(i + 1, row)
 
 L = {}
+ACT = ['Sport', 'Transitions (en français ou en anglais)']
+for k in ('S2', 'S4'):
+    for r in INFO[k][1]:
+        if r[1].startswith("Activité d'ouverture"):
+            r[1] = "Activité d'ouverture"
+            r[3:] = [ACT]
 L['info'] = {'n': 'Licence Informatique', 'P': INFO}
 
 # --- Droit
@@ -63,7 +83,7 @@ def eco(minor):
                            ['ES', 'Réflexion sur soi et sur son projet professionnel', 2], ['ES', 'Méthodologie de la recherche documentaire', 1]]],
         'S2': ['L1 · S2', [['DS', 'Comptabilité financière', 7], ['DS', 'Introduction à la macroéconomie', 7],
                            ['DS', "Mathématiques pour l'économie et la gestion 1", 6], ['DS', "Statistiques pour l'économie et la gestion", 6],
-                           ['TS', "Activité d'ouverture (transitions ou sport)", 2], ['LS', "Outils linguistiques pour l'économie et la gestion 1 : anglais", 2]]],
+                           ['TS', "Activité d'ouverture", 2, ACT], ['LS', "Outils linguistiques pour l'économie et la gestion 1 : anglais", 2]]],
         'S3': ['L2 · S3', [['DSA', 'Marketing fondamental', 6], ['DSA', 'Contrôle de gestion et contrôle budgétaire', 6],
                            ['DSB', 'Microéconomie intermédiaire', 6], ['DSB', 'Macroéconomie intermédiaire', 6],
                            ['TS', 'Responsabilité sociétale des entreprises (RSE)', 2], ['TS', 'Droit des contrats et des sociétés', 2],
@@ -71,7 +91,7 @@ def eco(minor):
         'S4': ['L2 · S4', [['DSA', 'Vente et négociation', 5], ['DSA', 'Management de la chaîne logistique globale', 5],
                            ['DSB', "Mathématiques et statistiques appliquées à l'économie et la gestion 2", 3], ['DSB', 'Économie internationale', 5],
                            ['TS', 'Expression écrite et certification Voltaire', 3], ['TS', 'Compétences numériques, bureautique et PIX', 3],
-                           ['TS', "Activité d'ouverture (transitions ou sport)", 2], ['LS', "Outils linguistiques pour l'économie et la gestion 3 : anglais", 2],
+                           ['TS', "Activité d'ouverture", 2, ACT], ['LS', "Outils linguistiques pour l'économie et la gestion 3 : anglais", 2],
                            ['ES', 'Premiers contacts avec le monde professionnel et mises en situation', 2]]],
         'S5': ['L3 · S5', [['DS', n, e] for n, e in zip(n5, s5)] + [
                            ['TS', "Compétences rédactionnelles pour l'économie et la gestion", 2], ['LS', 'Anglais', 2],
@@ -94,13 +114,13 @@ L['lettres'] = {'n': 'Licence Lettres · Lettres et arts', 'P': sems(g('LICENCE 
 
 src = dict(g('LICENCE LLCER-Anglais 2024-2028', 'Anglais (ANG)')); src.update(g('LICENCE LLCER-Anglais 2024-2028', 'Anglais'))
 P = sems(src)
-P['S5'][1].append(['LS', 'LVE (espagnol, reo mā’ohi ou mandarin)', 2])
+P['S5'][1].append(['LS', 'LVE', 2, ['Espagnol', 'Reo mā’ohi', 'Mandarin']])
 P['S6'][1].append(['ES', 'Valorisation des compétences préprofessionnelles (stage)', 6])
 L['llcer-ang'] = {'n': 'Licence LLCER Anglais', 'P': P}
 
 P = sems(g('LICENCE-LLCER LP 2024-2028', 'Langues Polynésiennes'))
 insert_after(P['S3'][1], 'Métiers de la transmission', ['ES', 'Métiers des arts et expression', 1])
-P['S5'][1] = [['ES', 'Valorisation des compétences préprofessionnelles (mobilité ou stages)', 30]]
+P['S5'][1] = [['ES', 'Valorisation des compétences préprofessionnelles', 30, ["Mobilité ou stage à l'international", 'Deux stages de 5 semaines']]]
 L['llcer-lp'] = {'n': 'Licence LLCER Langues polynésiennes', 'P': P}
 
 # PPPE : lignes « LLC.LP-PE  1.01  Nom ... ECTS », blocs « PPPE.DS1 »

@@ -3,7 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ma moyenne</title>
+<title>tupasse · combien il te faut au prochain exam ?</title>
+<meta name="description" content="Choisis ta licence UPF et ton semestre : tupasse calcule la moyenne de chaque bloc et la note à avoir au prochain CC ou au rattrapage pour valider.">
+<meta name="theme-color" content="#FAFADF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16151a" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://moneyfo.github.io/tupasse/">
+<meta property="og:title" content="tupasse · combien il te faut au prochain exam ?">
+<meta property="og:description" content="Choisis ta licence UPF et ton semestre : la note à viser pour valider chaque bloc, calculée pour toi.">
+<meta property="og:image" content="https://moneyfo.github.io/tupasse/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="fr_FR">
+<meta name="twitter:card" content="summary_large_image">
+<script>try{const t=localStorage.getItem('tupasse-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700;9..40,800&family=Caveat:wght@600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
@@ -33,7 +48,24 @@
         <button class="btn" id="licBtn">← changer de semestre</button>
         <button class="btn" id="editBtn">modifier la maquette</button>
         <button class="btn" id="clearBtn">vider les notes</button>
+        <button class="btn" id="ioBtn" aria-expanded="false" aria-controls="io">sauvegarder / restaurer</button>
+        <a class="btn ghost" id="bugLink" target="_blank" rel="noopener">une erreur dans la maquette ?</a>
       </div>
+      <section class="io" id="io" hidden aria-label="sauvegarder ou restaurer tes notes">
+        <div class="io-col">
+          <h3>sauvegarder</h3>
+          <p>copie ce code et garde-le (notes, mémo, message à toi-même) pour retrouver tes notes sur un autre appareil.</p>
+          <textarea id="ioOut" class="in area" readonly rows="3" aria-label="code de sauvegarde"></textarea>
+          <button class="btn cor" id="ioCopy">copier le code</button>
+        </div>
+        <div class="io-col">
+          <h3>restaurer</h3>
+          <p>colle un code de sauvegarde. il remplace les notes enregistrées dans ce navigateur.</p>
+          <textarea id="ioIn" class="in area" rows="3" placeholder="tupasse:…" aria-label="code à restaurer"></textarea>
+          <button class="btn" id="ioLoad">restaurer mes notes</button>
+        </div>
+        <p class="io-msg" id="ioMsg" role="status"></p>
+      </section>
       <p class="sample" id="sample" hidden>notes d'exemple pré-remplies : clique « vider les notes » pour repartir de zéro.</p>
       <div id="list"></div>
     </main>
@@ -51,8 +83,15 @@
         <div class="rule col"><span>le rattrapage…</span>
           <div class="pills" role="group" aria-label="règle du rattrapage">
             <button class="pill" data-rule="max">remplace la moyenne des CC s'il est meilleur</button>
-            <button class="pill" data-rule="cc">remplace le plus faible des 2 CC</button>
-            <button class="pill" data-rule="moy3">moyenne des 3 notes</button></div></div>
+            <button class="pill" data-rule="cc">remplace le CC le plus faible</button>
+            <button class="pill" data-rule="moy3">moyenne des CC et du rattrapage</button></div></div>
+        <div class="rule"><span>nombre de CC par défaut</span>
+          <span class="step-ctl"><button class="mini" id="nccMinus" aria-label="un CC de moins">−</button><b id="nccVal">2</b><button class="mini" id="nccPlus" aria-label="un CC de plus">+</button></span></div>
+        <p class="rule-note">chaque matière peut aussi avoir son propre nombre (menu « épreuves »).</p>
+        <div class="rule col" id="annRule"><span>compensation annuelle</span>
+          <div class="pills" role="group" aria-label="compensation annuelle">
+            <button class="pill" data-ann="0">non : semestre seul</button>
+            <button class="pill" data-ann="1" id="annYes">oui</button></div></div>
      </div>
 
     </aside>
@@ -61,15 +100,15 @@
     <div class="disc-h"><span class="disc-i" aria-hidden="true">!</span><h2 id="discT">DISCLAIMER</h2></div>
     <ul>
       <li>Les maquettes fournies proviennent directement de l'UPF (2024-2028, Informatique 2025-2026) : <a href="https://ged.ent.upf.pf/share/s/qbtefCsMStWH_AkOLtrRrA/folder" target="_blank" rel="noopener">voir les maquettes officielles ↗</a>. Les matières facultatives à 0 ects sont retirées du calcul.</li>
-      <li>une matière « validée » (déjà acquise) sort du calcul.</li>
+      <li>une matière « validée » (déjà acquise) sort du calcul. la compensation annuelle est une option des règles de calcul.</li>
       <li>le calcul suppose la même note sur toutes les épreuves restantes.</li>
     </ul>
-    <p class="disc-warn"><mark>Les notes éliminatoires, compensation annuelle, seconde chance… ne peuvent être prises en compte.</mark></p>
+    <p class="disc-warn"><mark>Les notes éliminatoires, seconde chance… ne peuvent être prises en compte.</mark></p>
   </section>
 
   <footer class="site-foot">
     <p>fait par <strong>Tams</strong> avec <strong>Claude</strong></p>
-    <span class="sf-c">2026</span>
+    <span class="sf-r"><button class="sf-theme" id="themeBtn" aria-label="changer le thème">thème : auto</button><span class="sf-c">2026</span></span>
   </footer>
 </div>
 
