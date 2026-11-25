@@ -29,8 +29,11 @@ let view='welcome',pick=S.chosen?S.sem:null;
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 const num=v=>{if(v==null||String(v).trim()==='')return null;const x=parseFloat(String(v).replace(',','.'));return isFinite(x)&&x>=0&&x<=20?x:NaN};
 const ok=x=>x!=null&&!isNaN(x);
-const fmt=(x,d=2)=>x.toFixed(d).replace('.',',').replace(/,?0+$/,'')||'0';
-const ceil=x=>Math.ceil(x*100-1e-9)/100;
+// pas d'arrondi : valeur exacte jusqu'à 3 décimales (9,875), au-delà on coupe sans arrondir (9,333…)
+const milli=x=>Math.round(x*1e9)/1e6; // x × 1000, débarrassé du bruit des flottants
+const fmt=x=>{const v=Math.trunc(milli(x))/1000;return v.toFixed(3).replace('.',',').replace(/(,\d*?)0+$/,'$1').replace(/,$/,'')};
+// note à viser : jamais en dessous de la vraie valeur
+const ceil=x=>Math.ceil(milli(x))/1000;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const ects=r=>Math.max(+String(r.e).replace(',','.')||0,0);
 const wts=()=>{const a=Math.min(Math.max(+String(S.w1).replace(',','.')||0,0),100)/100;return[a,1-a]};
@@ -84,7 +87,7 @@ function render(){
   if(view==='welcome'){welcome();return}
   const[yr,se]=P()[S.sem][0].split(' · ');
   $('crumb').textContent=LIC[S.lic].n.toLowerCase()+' · '+yr;
-  $('semTitle').innerHTML=`<span class="hl">semestre ${esc(se.slice(1))}</span>`;
+  $('semTitle').textContent=`semestre ${se.slice(1)}`;
   document.querySelectorAll('[data-rule]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.rule===S.rule));
   $('w1').value=S.w1;$('w2').textContent=fmt(100-(+String(S.w1).replace(',','.')||0));
   $('editBtn').classList.toggle('on',S.edit);$('editBtn').textContent=S.edit?'terminer':'modifier la maquette';
@@ -135,7 +138,7 @@ function update(){
   else if(R.need>20){s='no';big='&gt;20';sub=R.phase===1?`même avec 20 ${ep}, ce bloc plafonne à ${fmt(R.f(20))}. il restera le rattrapage.`:`même avec 20 au rattrapage sur ces ${R.n} matière(s), ce bloc plafonne à ${fmt(R.f(20))}. ajoute des matières à repasser.`}
   else{const n=ceil(R.need);s=n<=10?'':n<=14?'mid':'hard';big=fmt(n)+'<small>/20</small>';
     sub=(R.phase===1?`sur chacun des ${R.n} CC qui restent dans ce bloc`:`sur chacune des ${R.n} matière(s) repassée(s) de ce bloc`)+`, pour qu’il ait 10. c’est le bloc le plus serré.`}
-  const card=$('card');card.dataset.s=s;$('lbl').textContent=lbl;$('big').innerHTML=big;$('sub').textContent=sub;
+  const card=$('card');card.dataset.s=s;$('lbl').textContent=lbl;$('big').innerHTML=big;$('big').classList.toggle('long',big.replace(/<small>.*$/,'').length>4);$('sub').textContent=sub;
   $('mobl').textContent=lbl;$('mobv').innerHTML=big;$('mob').style.background=getComputedStyle(card).backgroundColor;
   $('bl').innerHTML=['DS','TS','LS','ES'].filter(k=>per[k]).map(k=>{const p=per[k];
     return `<div><span class="bk" style="--c:${B[k][1]}">${k}</span><span class="bm">${p.cur!=null?'moyenne '+fmt(p.cur):p.E?'pas encore de note':'matières acquises'}</span><span class="bs">${short(p)}</span></div>`}).join('');
