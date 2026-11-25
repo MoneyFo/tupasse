@@ -41,7 +41,7 @@
       </div>
       <p class="sample" id="sample" hidden>notes d'exemple pré-remplies : clique « vider les notes » pour repartir de zéro.</p>
       <div id="list"></div>
-      <p class="foot">maquette : licence informatique 2025-2026 (matières facultatives à 0 ects retirées). le calcul suppose la même note sur toutes les épreuves restantes. vérifie le règlement de ta fac : notes éliminatoires, compensation annuelle, seconde chance… peuvent changer la donne.</p>
+      <p class="foot">maquette : licence informatique 2025-2026 (matières facultatives à 0 ects retirées). chaque matière = CC1 + CC2, puis rattrapage si le semestre n’est pas validé. le calcul suppose la même note sur toutes les épreuves restantes. vérifie le règlement de ta fac : notes éliminatoires, compensation annuelle, seconde chance… peuvent changer la donne.</p>
     </main>
 
     <aside class="res" aria-live="polite">
@@ -54,7 +54,7 @@
         <div class="scale"><span>0</span><span id="scaleMid">ta moyenne actuelle</span><span>20</span></div>
         <div class="stats">
           <div class="st"><span>moyenne actuelle</span><strong id="cur">–</strong></div>
-          <div class="st"><span>ects déjà notés</span><strong id="done">–</strong></div>
+          <div class="st"><span id="donel">ects déjà notés</span><strong id="done">–</strong></div>
         </div>
         <div class="bl" id="bl"></div>
       </div>
@@ -63,6 +63,16 @@
         <svg class="deco" width="22" height="22" style="top:-11px;left:18px" fill="#F9A8B8"><use href="#star"/></svg>
         <h3>objectif</h3>
         <div class="pills" id="targets"></div>
+      </div>
+
+      <div class="panel">
+        <h3>règles de calcul</h3>
+        <div class="rule"><label for="w1">poids du CC1</label><span><input class="in sm" id="w1" inputmode="decimal"> % · CC2 <b id="w2">50</b> %</span></div>
+        <div class="rule col"><span>le rattrapage…</span>
+          <div class="pills" role="group" aria-label="règle du rattrapage">
+            <button class="pill" data-rule="max">remplace la moyenne des CC s'il est meilleur</button>
+            <button class="pill" data-rule="cc">remplace le plus faible des 2 CC</button>
+            <button class="pill" data-rule="moy3">moyenne des 3 notes</button></div></div>
       </div>
 
       <div class="panel">
