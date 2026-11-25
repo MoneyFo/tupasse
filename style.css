@@ -221,3 +221,27 @@ a.btn{color:var(--ink);text-decoration:none}
   .notes .in{width:70px}
   .notes .f.ra{margin-left:0;padding-left:0;border-left:0}
 }
+/* panneau sauvegarder / restaurer : les deux colonnes alignées ligne à ligne */
+.io{grid-template-rows:auto auto auto auto;row-gap:0}
+.io-col{display:grid;grid-row:span 4;grid-template-rows:subgrid;align-items:start;justify-items:start}
+.io-col p{align-self:start}
+.io-col .in.area{margin:0 0 12px;align-self:end}
+.io-msg{grid-row:auto;margin-top:12px!important}
+@media(max-width:700px){.io-col{grid-row:auto;grid-template-rows:none}.io-col+.io-col{margin-top:18px}}
+/* règles de calcul : espacement régulier */
+.panel{display:grid;gap:18px}
+.panel h3{margin:0 0 -8px}
+.panel .rule{margin:0}
+.panel .rule-note{margin:-12px 0 0}
+#annRule{margin-top:0}
+/* en-tête de bloc : icône et titre sur la même ligne */
+.bh{flex-wrap:nowrap}
+.bh>div{flex:1;min-width:0}
+.bh .need{flex:none}
+/* téléphone : boutons du haut en grille régulière */
+@media(max-width:600px){
+  .bar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:stretch}
+  .bar .btn{justify-content:center;text-align:center;width:100%;padding:8px 10px;font-size:13.5px}
+  #licBtn,#ioBtn,#bugLink{grid-column:1/-1}
+  .bh h2{font-size:17px}
+}
