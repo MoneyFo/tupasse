@@ -6,10 +6,10 @@ Calcule la note qu'il te faut au prochain examen pour valider ton semestre à l'
 
 - Les **ECTS servent de coefficients** (une matière à 5 ECTS compte 5 fois).
 - Tu remplis les notes que tu as déjà. Ce qui reste à passer, tu le laisses vide.
-- Le site calcule la note à avoir **sur chaque épreuve restante** pour atteindre 10 (ou 12, 14, 16 pour une mention).
-- Deux modes de calcul :
-  - **un seul bloc** : tout le semestre est compensé ensemble (cas de la licence informatique) ;
-  - **chaque bloc séparément** : DS, TS, LS et ES doivent chacun atteindre l'objectif.
+- Le calcul se fait **par bloc** (DS, TS, LS, ES) : chaque bloc doit avoir 10 de moyenne.
+  Le site affiche la moyenne de chaque bloc et la note à avoir **sur chaque épreuve restante** du bloc le plus serré.
+- Bouton **« validée ? »** sur chaque matière : pour une matière déjà acquise (redoublement).
+  Elle sort du calcul, sauf si tu indiques la note gardée.
 - Chaque matière a **2 CC** (poids réglable, 50/50 par défaut) et **1 rattrapage**.
 - Tant qu'il reste des CC à passer, le site donne la note à viser au(x) CC restant(s).
   Quand tous les CC sont notés et que le semestre n'est pas validé, il donne la note à viser au rattrapage

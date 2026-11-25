@@ -28,11 +28,9 @@
     <div class="wcard">
       <div class="step"><span class="num">1</span><label for="licSel">ta licence</label></div>
       <select id="licSel" class="sel"></select>
-      <p class="wsub" id="licSub"></p>
       <div class="step"><span class="num">2</span><span>ton semestre</span></div>
       <div class="semgrid" id="semGrid" role="radiogroup" aria-label="semestre"></div>
       <button class="calc" id="calcBtn" disabled>calculer</button>
-      <p class="note" style="margin:16px 0 0;transform:rotate(-1.5deg)">tes notes restent dans ton navigateur ✦</p>
     </div>
   </section>
 
@@ -50,7 +48,7 @@
       </div>
       <p class="sample" id="sample" hidden>notes d'exemple pré-remplies : clique « vider les notes » pour repartir de zéro.</p>
       <div id="list"></div>
-      <p class="foot">maquette fournie : licence informatique 2025-2026 (matières facultatives à 0 ects retirées). chaque matière = CC1 + CC2, puis rattrapage si le semestre n’est pas validé. le calcul suppose la même note sur toutes les épreuves restantes. vérifie le règlement de ta fac : notes éliminatoires, compensation annuelle, seconde chance… peuvent changer la donne.</p>
+      <p class="foot">maquette fournie : licence informatique 2025-2026 (matières facultatives à 0 ects retirées). chaque bloc doit avoir 10 de moyenne. chaque matière = CC1 + CC2, puis rattrapage si le bloc n’est pas validé. une matière « validée » (déjà acquise) sort du calcul, sauf si tu indiques la note gardée. le calcul suppose la même note sur toutes les épreuves restantes. vérifie le règlement de ta fac : notes éliminatoires, compensation annuelle, seconde chance… peuvent changer la donne.</p>
     </main>
 
     <aside class="res" aria-live="polite">
@@ -59,26 +57,12 @@
         <div class="lbl" id="lbl">note à viser partout</div>
         <div class="big" id="big">–</div>
         <p class="sub" id="sub"></p>
-        <div class="meter" aria-hidden="true"><i id="fill"></i><b id="mark"></b></div>
-        <div class="scale"><span>0</span><span id="scaleMid">ta moyenne actuelle</span><span>20</span></div>
-        <div class="stats">
-          <div class="st"><span>moyenne actuelle</span><strong id="cur">–</strong></div>
-          <div class="st"><span id="donel">ects déjà notés</span><strong id="done">–</strong></div>
-        </div>
         <div class="bl" id="bl"></div>
-      </div>
-
-      <div class="panel">
-        <svg class="deco" width="22" height="22" style="top:-11px;left:18px" fill="#F9A8B8"><use href="#star"/></svg>
-        <h3>objectif</h3>
-        <div class="pills" id="targets"></div>
       </div>
 
       <div class="panel">
         <h3>règles de calcul</h3>
         <div class="rule"><label for="w1">poids du CC1</label><span><input class="in sm" id="w1" inputmode="decimal"> % · CC2 <b id="w2">50</b> %</span></div>
-        <div class="rule col" style="margin-bottom:14px"><span>les blocs…</span>
-          <div class="pills" role="group" aria-label="mode de calcul"><button class="pill" data-mode="sem">se compensent (un seul bloc)</button><button class="pill" data-mode="bloc">doivent chacun avoir la moyenne</button></div></div>
         <div class="rule col"><span>le rattrapage…</span>
           <div class="pills" role="group" aria-label="règle du rattrapage">
             <button class="pill" data-rule="max">remplace la moyenne des CC s'il est meilleur</button>
@@ -86,12 +70,6 @@
             <button class="pill" data-rule="moy3">moyenne des 3 notes</button></div></div>
       </div>
 
-      <div class="panel">
-        <h3>et si j'ai… partout ?</h3>
-        <input type="range" id="sim" min="0" max="20" step="0.25" value="10" aria-label="note simulée sur les épreuves restantes">
-        <div class="simout"><span>avec <b id="simv">10</b>/20 aux épreuves restantes</span><strong id="simr">–</strong></div>
-      </div>
-      <p class="note" style="margin:14px 4px 0;transform:rotate(-2deg)">↑ glisse pour tester tes scénarios</p>
     </aside>
   </div>
 </div>
