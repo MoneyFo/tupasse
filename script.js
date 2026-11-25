@@ -141,13 +141,14 @@ function render(){
 function rowHTML(r,i){
   const k=K(r),v=ccs(r);
   const opt=r.o?`<label class="optw">ton option <select class="opt" data-f="oc"><option value="">à choisir…</option>${r.o.map(o=>`<option${o===r.oc?' selected':''}>${esc(o)}</option>`).join('')}</select></label>`:'';
-  const notes=r.va?'':v.map((x,j)=>`<label class="f">${k===1?'note':'cc'+(j+1)}<input class="in" data-f="cc" data-j="${j}" inputmode="decimal" placeholder="?" value="${esc(x)}"></label>`).join('')+`
-    <label class="f ra">rattrapage<input class="in" data-f="ra" inputmode="decimal" placeholder="—" value="${esc(r.ra)}"></label>
-    <label class="f">épreuves<select class="in nk" data-f="k">${Array.from({length:MAXCC},(_,n)=>n+1).map(n=>`<option value="${n}"${n===k?' selected':''}>${n===1?'1 note':n+' CC'}</option>`).join('')}</select></label>
-    <button class="mini" data-act="rt" hidden>rattrapage ?</button>`;
-  return `<div class="row${r.va?' acq':''}" data-i="${i}"><div><div class="nm">${esc(r.n)}</div><div class="meta"><span class="ects">${fmt(ects(r))} ects</span><span data-chip></span></div></div>
-    <div class="fields">${notes}
-    <button class="mini va" data-act="va" aria-pressed="${!!r.va}" title="matière déjà validée (redoublement)">${r.va?'✓ validée':'validée ?'}</button></div>${opt}</div>`;
+  const sel=`<select class="in nk" data-f="k" aria-label="nombre d'épreuves">${Array.from({length:MAXCC},(_,n)=>n+1).map(n=>`<option value="${n}"${n===k?' selected':''}>${n===1?'1 note':n+' CC'}</option>`).join('')}</select>`;
+  const notes=v.map((x,j)=>`<label class="f">${k===1?'note':'cc'+(j+1)}<input class="in" data-f="cc" data-j="${j}" inputmode="decimal" placeholder="?" value="${esc(x)}"></label>`).join('')
+    +`<label class="f ra">rattrapage<input class="in" data-f="ra" inputmode="decimal" placeholder="—" value="${esc(r.ra)}"></label>`;
+  return `<div class="row${r.va?' acq':''}" data-i="${i}">
+    <div class="rhead"><div class="nm">${esc(r.n)}</div><div class="meta"><span class="ects">${fmt(ects(r))} ects</span><span data-chip></span></div></div>
+    <div class="rtools">${r.va?'':sel+'<button class="mini" data-act="rt" hidden>rattrapage ?</button>'}
+      <button class="mini va" data-act="va" aria-pressed="${!!r.va}" title="matière déjà validée (redoublement)">${r.va?'✓ validée':'validée ?'}</button></div>
+    ${r.va?'':`<div class="notes">${notes}</div>`}${opt}</div>`;
 }
 function check(el){const f=el.dataset.f;if(f==='n'||f==='k'||f==='oc')return;const v=el.value,x=parseFloat(String(v).replace(',','.'));
   el.classList.toggle('bad',v.trim()!==''&&!(isFinite(x)&&x>=0&&x<=(f==='e'?60:20)))}
