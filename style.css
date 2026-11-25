@@ -115,7 +115,7 @@ input[type=range]{width:100%;accent-color:var(--purple);height:30px}
 /* accueil : licence puis semestre */
 .navr{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0}
 .btn.lic{background:var(--bg);font-size:13.5px;max-width:100%}
-.welcome{max-width:560px;margin:0 auto;min-height:calc(100vh - 32px);min-height:calc(100dvh - 32px);display:grid;align-content:center;padding:16px 0}
+.welcome{max-width:560px;margin:0 auto;min-height:calc(100vh - 110px);min-height:calc(100dvh - 110px);display:grid;align-content:center;padding:16px 0}
 .wcard{position:relative;z-index:1;background:var(--surface);border:var(--b);border-radius:14px;box-shadow:var(--sh-lg);padding:clamp(18px,4vw,30px)}
 .step{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;margin-bottom:10px}
 .step+.semgrid{margin-top:2px}
@@ -154,5 +154,6 @@ body[data-view=welcome] .wrap{padding-bottom:16px}
 .row.acq{background:light-dark(#f1fbf9,#1f2a29)}
 .row.acq .nm{text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:var(--teal)}
 .big.long{font-size:clamp(48px,5.8vw,72px)}
-.panel .foot{margin:16px 0 0;font-size:13px;line-height:1.5;padding-top:14px;border-top:1.5px dashed light-dark(#cfcdb9,#4a4852)}
-@media(max-width:900px){.res{display:contents}#card{order:-1}.res .panel{order:2}}
+.res .foot{margin:16px 4px 0;font-size:13px;line-height:1.5}
+.site-foot{margin-top:40px;padding-top:16px;border-top:2px solid var(--line);font-size:13.5px;font-weight:600;color:var(--muted);text-align:center}
+@media(max-width:900px){.res{display:contents}#card{order:-1}.res .panel,.res .foot{order:2}}
