@@ -37,9 +37,9 @@ const ceil=x=>Math.ceil(milli(x))/1000;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const ects=r=>Math.max(+String(r.e).replace(',','.')||0,0);
 const wts=()=>{const a=Math.min(Math.max(+String(S.w1).replace(',','.')||0,0),100)/100;return[a,1-a]};
-const ccAvg=r=>{if(r.va)return num(r.vn);const[a,b]=wts(),x=num(r.c1),y=num(r.c2);return ok(x)&&ok(y)?a*x+b*y:null};
+const ccAvg=r=>{const[a,b]=wts(),x=num(r.c1),y=num(r.c2);return ok(x)&&ok(y)?a*x+b*y:null};
 // note de la matière une fois le rattrapage connu, selon la règle choisie
-const rated=(r,ra)=>{if(r.va)return num(r.vn);const m=ccAvg(r);if(!ok(ra)||m==null)return m;const[a,b]=wts(),x=num(r.c1),y=num(r.c2);
+const rated=(r,ra)=>{const m=ccAvg(r);if(!ok(ra)||m==null)return m;const[a,b]=wts(),x=num(r.c1),y=num(r.c2);
   if(S.rule==='moy3')return (x+y+ra)/3;          // moyenne des 3 notes
   if(S.rule==='cc')return x<=y?a*ra+b*y:a*x+b*ra; // remplace le plus faible des deux CC
   return Math.max(m,ra)};                         // garde le rattrapage s'il est meilleur que la moyenne des CC
@@ -48,12 +48,13 @@ const rated=(r,ra)=>{if(r.va)return num(r.vn);const m=ccAvg(r);if(!ok(ra)||m==nu
 // phase 1 : il reste des CC à passer → inconnues = CC vides.
 // phase 2 : tous les CC sont là → si pas validé, inconnues = rattrapages des matières repassées.
 function calc(list){
-  const L=list.filter(r=>ects(r)>0&&!(r.va&&!ok(num(r.vn)))),E=L.reduce((s,r)=>s+ects(r),0),[a,b]=wts(),T0=S.target-1e-9;
+  const L=list.filter(r=>ects(r)>0&&!r.va),  // matière validée = hors calcul
+   E=L.reduce((s,r)=>s+ects(r),0),[a,b]=wts(),T0=S.target-1e-9;
   const o={E,phase:1,n:0,need:null,cur:null,fin:null,valid:false,doneE:0,onlyCC2:true,inR:()=>false,f:()=>0};
   if(!E)return o;
   if(L.some(r=>ccAvg(r)==null)){
     let K=0,U=0;
-    for(const r of L){const e=ects(r);if(r.va){K+=e*num(r.vn);continue}for(const[v,w,k]of[[r.c1,a,1],[r.c2,b,2]]){const x=num(v);
+    for(const r of L){const e=ects(r);for(const[v,w,k]of[[r.c1,a,1],[r.c2,b,2]]){const x=num(v);
       if(ok(x))K+=e*w*x;else if(w>0){U+=e*w;o.n++;if(k===1)o.onlyCC2=false}}}
     o.doneE=E-U;o.cur=E-U>1e-9?K/(E-U):null;o.f=x=>(K+U*x)/E;
   }else{
@@ -98,7 +99,7 @@ function render(){
       <div><h2>${k} · ${name}</h2><small data-tot="${k}"></small></div><span class="need" data-bneed="${k}"></span></div>
       ${it.map(([r,i])=>S.edit?`<div class="row edit-row" data-i="${i}"><input class="in wide" data-f="n" value="${esc(r.n)}" aria-label="nom de la matière"><input class="in sm" data-f="e" inputmode="decimal" value="${esc(r.e)}" aria-label="ects"><button class="mini" data-act="del" aria-label="supprimer">×</button></div>`
       :`<div class="row${r.va?' acq':''}" data-i="${i}"><div><div class="nm">${esc(r.n)}</div><div class="meta"><span class="ects">${esc(r.e)} ects</span><span data-chip></span></div></div>
-        <div class="fields">${r.va?`<label class="f">note gardée<input class="in" data-f="vn" inputmode="decimal" placeholder="—" value="${esc(r.vn||'')}"></label>`:`
+        <div class="fields">${r.va?'':`
           <label class="f">cc1<input class="in" data-f="c1" inputmode="decimal" placeholder="?" value="${esc(r.c1)}"></label>
           <label class="f">cc2<input class="in" data-f="c2" inputmode="decimal" placeholder="?" value="${esc(r.c2)}"></label>
           <label class="f ra">rattrapage<input class="in" data-f="ra" inputmode="decimal" placeholder="—" value="${esc(r.ra)}"></label>
@@ -119,7 +120,7 @@ function update(){
     if(t&&p)t.textContent=`${fmt(g[k].reduce((s,[r])=>s+ects(r),0))} ects`+(p.cur!=null?` · moyenne ${fmt(p.cur)}`:'');
     const n=document.querySelector(`[data-bneed="${k}"]`);if(n)n.innerHTML=p&&!S.edit?`<span class="tag ${p.valid||!p.E?'t':'y'}">${short(p)}</span>`:''}
   document.querySelectorAll('#list .row[data-i]').forEach(el=>{const r=rows()[el.dataset.i],c=el.querySelector('[data-chip]'),bt=el.querySelector('[data-act=rt]');if(!c)return;
-    if(r.va){const v=num(r.vn);c.innerHTML=`<span class="tag t">acquise${ok(v)?' · '+fmt(v):''}</span>`;return}
+    if(r.va){c.innerHTML='<span class="tag t">acquise · hors calcul</span>';return}
     const G=per[r.b],avg=ccAvg(r);
     if(G.phase===1)c.innerHTML=avg==null?tag(G.need,'vise'):`<span class="tag">= ${fmt(avg)}</span>`;
     else if(G.inR(r))c.innerHTML=tag(G.need,'ratt. : vise');
@@ -154,7 +155,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)r
     if(a==='rt')rows()[i].rt=t.getAttribute('aria-pressed')!=='true';
     else if(a==='va')rows()[i].va=!rows()[i].va;
     else if(a==='del')rows().splice(i,1);
-    else if(a==='add')rows().push({b:t.closest('[data-b]').dataset.b,n:'nouvelle matière',e:2,c1:'',c2:'',ra:'',rt:null,va:false,vn:''});
+    else if(a==='add')rows().push({b:t.closest('[data-b]').dataset.b,n:'nouvelle matière',e:2,c1:'',c2:'',ra:'',rt:null,va:false});
     else if(a==='reset')S.data[dkey()]=fresh(S.sem);
     else return}
   else return;

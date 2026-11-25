@@ -9,7 +9,7 @@ Calcule la note qu'il te faut au prochain examen pour valider ton semestre à l'
 - Le calcul se fait **par bloc** (DS, TS, LS, ES) : chaque bloc doit avoir 10 de moyenne.
   Le site affiche la moyenne de chaque bloc et la note à avoir **sur chaque épreuve restante** du bloc le plus serré.
 - Bouton **« validée ? »** sur chaque matière : pour une matière déjà acquise (redoublement).
-  Elle sort du calcul, sauf si tu indiques la note gardée.
+  Elle sort du calcul : sa note ne compte pas.
 - Chaque matière a **2 CC** (poids réglable, 50/50 par défaut) et **1 rattrapage**.
 - Tant qu'il reste des CC à passer, le site donne la note à viser au(x) CC restant(s).
   Quand tous les CC sont notés et que le semestre n'est pas validé, il donne la note à viser au rattrapage
