@@ -1,8 +1,8 @@
 # tupasse
 
-Calcule la note qu'il te faut au prochain examen pour valider ton semestre à l'université.
+Calcule la note qu'il te faut au prochain examen pour valider ton semestre.
 
-À l'arrivée, tu choisis ta licence dans un menu déroulant, puis ton semestre, et tu cliques sur **calculer**. La page suivante ne montre que ce semestre ; le bouton « changer de semestre », à côté de « modifier la maquette », ramène au choix.
+Choisis ta licence, puis ton semestre.
 
 - Les **ECTS servent de coefficients** (une matière à 5 ECTS compte 5 fois).
 - Tu remplis les notes que tu as déjà. Ce qui reste à passer, tu le laisses vide.
@@ -31,10 +31,6 @@ Choix faits pour coller au calcul par bloc :
 - LAS S2 : le bloc « Santé 2 » (15 ECTS, UE selon la filière) est une seule ligne ;
 - licence pro ERME : chaque UE est un bloc ;
 - LLCER Anglais : la maquette donne 28 et 24 ECTS en L3 ; on a ajouté la LVE (2) en S5 et le stage (6) en S6 pour arriver à 30.
-
-## Lancer
-
-Quatre fichiers (`index.html`, `style.css`, `script.js`, `licences.js`), sans dépendance à installer. Ouvre-le dans un navigateur, ou active GitHub Pages (Settings → Pages → branche `main`, dossier `/`).
 
 ## Formule
 
