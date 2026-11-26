@@ -53,15 +53,22 @@ const ceil=x=>Math.ceil(milli(x))/1000;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const ects=r=>Math.max(+String(r.e).replace(',','.')||0,0);
 
-// --- notes d'une matière : N CC qui comptent pareil (N = 1 : une seule note)
+// --- notes d'une matière : N CC (N = 1 : une seule note), chacune avec son pourcentage (égaux par défaut)
 const MAXCC=6;
 const K=r=>Math.min(MAXCC,Math.max(1,+(r.k??S.ncc)||2));
 const ccs=r=>{const a=(r.cc||[]).slice(0,K(r));while(a.length<K(r))a.push('');return a};
-const ccAvg=r=>{const v=ccs(r).map(num);return v.every(ok)?v.reduce((s,x)=>s+x,0)/v.length:null};
+// poids de chaque note : la valeur saisie (en %) ; les cases vides se partagent le reste jusqu'à 100 %.
+// les poids sont ensuite ramenés à leur total (60 + 30 = 90 → 66,7 % / 33,3 %)
+const wts=r=>{const k=K(r),raw=Array.from({length:k},(_,j)=>{const x=r.w?parseFloat(String(r.w[j]??'').replace(',','.')):NaN;return isFinite(x)&&x>=0&&x<=100?x:null});
+  const set=raw.filter(x=>x!=null),free=k-set.length,rest=free?Math.max(0,100-set.reduce((s,x)=>s+x,0))/free:0;
+  const w=raw.map(x=>x??rest);return w.some(x=>x>0)?w:w.map(()=>100/k)};
+const ccAvg=r=>{const v=ccs(r).map(num),w=wts(r),T=w.reduce((s,x)=>s+x,0);let s=0;
+  for(let j=0;j<v.length;j++){if(!w[j])continue;if(!ok(v[j]))return null;s+=w[j]*v[j]}return s/T};
 // note de la matière une fois le rattrapage connu, selon la règle choisie
-const rated=(r,ra)=>{const m=ccAvg(r);if(!ok(ra)||m==null)return m;const v=ccs(r).map(num),t=v.reduce((s,x)=>s+x,0);
-  if(S.rule==='moy3')return (t+ra)/(v.length+1);            // moyenne des CC et du rattrapage
-  if(S.rule==='cc')return (t-Math.min(...v)+ra)/v.length;    // remplace le CC le plus faible
+const rated=(r,ra)=>{const m=ccAvg(r);if(!ok(ra)||m==null)return m;
+  const v=ccs(r).map(num),w=wts(r),T=w.reduce((s,x)=>s+x,0),idx=v.map((_,j)=>j).filter(j=>w[j]>0);
+  if(S.rule==='moy3'){const wb=T/idx.length;return (m*T+wb*ra)/(T+wb)}     // moyenne des CC et du rattrapage (le rattrapage pèse comme une note moyenne)
+  if(S.rule==='cc'){const lo=idx.reduce((a,b)=>v[b]<v[a]?b:a);return m+w[lo]*(ra-v[lo])/T}  // remplace le CC le plus faible (il garde son poids)
   return Math.max(m,ra)};                                    // garde le rattrapage s'il est meilleur
 
 // calcule un bloc.
@@ -74,8 +81,8 @@ function calc(list){
   if(!E)return o;
   if(L.some(r=>ccAvg(r)==null)){
     let Kn=0,U=0;
-    for(const r of L){const e=ects(r),v=ccs(r),w=1/v.length;
-      v.forEach((x,i)=>{const y=num(x);if(ok(y))Kn+=e*w*y;else{U+=e*w;o.n++;o.miss.add(v.length===1?'note':'CC'+(i+1))}})}
+    for(const r of L){const e=ects(r),v=ccs(r),w=wts(r),T=w.reduce((s,x)=>s+x,0);
+      v.forEach((x,i)=>{if(!w[i])return;const y=num(x),f=w[i]/T;if(ok(y))Kn+=e*f*y;else{U+=e*f;o.n++;o.miss.add(v.length===1?'note':'CC'+(i+1))}})}
     o.cur=E-U>1e-9?Kn/(E-U):null;o.f=x=>(Kn+U*x)/E;
   }else{
     o.phase=2;
@@ -142,16 +149,17 @@ function rowHTML(r,i){
   const k=K(r),v=ccs(r);
   const opt=r.o?`<label class="optw">ton option <select class="opt" data-f="oc"><option value="">à choisir…</option>${r.o.map(o=>`<option${o===r.oc?' selected':''}>${esc(o)}</option>`).join('')}</select></label>`:'';
   const sel=`<select class="in nk" data-f="k" aria-label="nombre d'épreuves">${Array.from({length:MAXCC},(_,n)=>n+1).map(n=>`<option value="${n}"${n===k?' selected':''}>${n===1?'1 note':n+' CC'}</option>`).join('')}</select>`;
-  const notes=v.map((x,j)=>`<label class="f">${k===1?'note':'cc'+(j+1)}<input class="in" data-f="cc" data-j="${j}" inputmode="decimal" placeholder="?" value="${esc(x)}"></label>`).join('')
+  const nm=j=>k===1?'note':'cc'+(j+1);
+  const notes=v.map((x,j)=>`<div class="f"><span>${nm(j)}</span><input class="in" data-f="cc" data-j="${j}" inputmode="decimal" placeholder="?" value="${esc(x)}" aria-label="${nm(j)}">${r.pw&&k>1?`<span class="pct-wrap"><input class="in pct" data-f="w" data-j="${j}" inputmode="decimal" placeholder="${fmt(100/k)}" value="${esc((r.w||[])[j]??'')}" aria-label="pourcentage de ${nm(j)}">%</span>`:''}</div>`).join('')
     +`<label class="f ra">rattrapage<input class="in" data-f="ra" inputmode="decimal" placeholder="—" value="${esc(r.ra)}"></label>`;
   return `<div class="row${r.va?' acq':''}" data-i="${i}">
     <div class="rhead"><div class="nm">${esc(r.n)}</div><div class="meta"><span class="ects">${fmt(ects(r))} ects</span><span data-chip></span></div></div>
-    <div class="rtools">${r.va?'':sel+'<button class="mini" data-act="rt" hidden>rattrapage ?</button>'}
+    <div class="rtools">${r.va?'':sel+(k>1?`<button class="mini pw" data-act="pw" aria-pressed="${!!r.pw}" title="modifier le pourcentage de chaque note">${r.pw?'✓ %':'%'}</button>`:'')+'<button class="mini" data-act="rt" hidden>rattrapage ?</button>'}
       <button class="mini va" data-act="va" aria-pressed="${!!r.va}" title="matière déjà validée (redoublement)">${r.va?'✓ validée':'validée ?'}</button></div>
-    ${r.va?'':`<div class="notes">${notes}</div>`}${opt}</div>`;
+    ${r.va?'':`<div class="notes">${notes}</div>`}${r.pw&&!r.va&&k>1?'<p class="pw-hint" data-pwhint></p>':''}${opt}</div>`;
 }
 function check(el){const f=el.dataset.f;if(f==='n'||f==='k'||f==='oc')return;const v=el.value,x=parseFloat(String(v).replace(',','.'));
-  el.classList.toggle('bad',v.trim()!==''&&!(isFinite(x)&&x>=0&&x<=(f==='e'?60:20)))}
+  el.classList.toggle('bad',v.trim()!==''&&!(isFinite(x)&&x>=0&&x<=(f==='e'?60:f==='w'?100:20)))}
 
 function short(p){return !p.E?'acquis':p.valid?'validé':p.need==null?(p.phase===2?'à rattraper':'–'):p.need<=0?'déjà ok':p.need>20?'&gt; 20':`vise ${fmt(ceil(p.need))}${p.phase===2?' (ratt.)':''}`}
 function update(){
@@ -163,6 +171,8 @@ function update(){
     const n=document.querySelector(`[data-bneed="${CSS.escape(k)}"]`);if(n)n.innerHTML=a&&!S.edit&&(a.valid||!a.E)?`<span class="tag t">${short(a)}</span>`:''}
   document.querySelectorAll('#list .row[data-i]').forEach(el=>{const r=rows()[el.dataset.i],c=el.querySelector('[data-chip]'),bt=el.querySelector('[data-act=rt]');if(!c)return;
     if(r.va){c.innerHTML='<span class="tag t">acquise · hors calcul</span>';return}
+    const hint=el.querySelector('[data-pwhint]');
+    if(hint){const w=wts(r);el.querySelectorAll('[data-f=w]').forEach(x=>{x.placeholder=fmt(w[+x.dataset.j])});const t=w.reduce((s,x)=>s+x,0);hint.textContent=Math.abs(t-100)<1e-6?'total : 100 %':`total : ${fmt(t)} % · les pourcentages sont ramenés à 100 %`;hint.classList.toggle('warn',Math.abs(t-100)>=1e-6)}
     const G=per[r.b],avg=ccAvg(r);
     if(G.phase===1)c.innerHTML=avg==null?'':`<span class="tag">= ${fmt(avg)}</span>`;
     else if(G.inR(r))c.innerHTML='';
@@ -216,6 +226,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)r
   else if(t.id==='clearBtn'){rows().forEach(r=>{r.cc=[];r.ra='';r.rt=null});S.sample=false}
   else if(t.dataset.act){const a=t.dataset.act,row=t.closest('[data-i]'),i=row?+row.dataset.i:-1;
     if(a==='rt')rows()[i].rt=t.getAttribute('aria-pressed')!=='true';
+    else if(a==='pw'){const r=rows()[i];r.pw=!r.pw;if(!r.pw)delete r.w}
     else if(a==='va')rows()[i].va=!rows()[i].va;
     else if(a==='del')rows().splice(i,1);
     else if(a==='add')rows().push({b:t.closest('[data-b]').dataset.b,n:'nouvelle matière',e:2,cc:[],ra:'',rt:null,va:false});
@@ -226,7 +237,8 @@ document.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)r
 function onField(e){const el=e.target,row=el.closest('[data-i]'),f=el.dataset.f;if(!row||!f)return;
   const r=rows()[+row.dataset.i];
   if(f==='cc'){const j=+el.dataset.j,a=(r.cc||[]).slice();while(a.length<=j)a.push('');a[j]=el.value;r.cc=a}
-  else if(f==='k'){r.k=+el.value;save();render();return}
+  else if(f==='k'){r.k=+el.value;delete r.w;save();render();return}
+  else if(f==='w'){const jj=+el.dataset.j,a=(r.w||[]).slice();while(a.length<=jj)a.push('');a[jj]=el.value;r.w=a}
   else if(f==='oc'){r.oc=el.value;save();return}
   else r[f]=el.value;
   check(el);save();update()}

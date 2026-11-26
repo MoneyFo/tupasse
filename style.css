@@ -260,3 +260,11 @@ a.btn{color:var(--ink);text-decoration:none}
 .sf-claude{display:inline-flex;align-items:center;gap:5px}
 .sf-claude img{width:18px;height:18px;display:block}
 @media(max-width:600px){.sf-l{flex-direction:column;gap:8px}}
+/* pourcentages des notes */
+.notes .f{display:grid;gap:2px;font-size:13px;font-weight:600;color:var(--muted)}
+.pct-wrap{display:flex;align-items:center;gap:4px;margin-top:4px;font-weight:700;color:var(--muted)}
+.notes .in.pct{width:52px;height:34px;padding:4px 6px;font-size:14px;box-shadow:2px 2px 0 var(--line)}
+.mini.pw[aria-pressed=true]{background:var(--lav);color:#111}
+.pw-hint{grid-column:1/-1;margin:0;font-size:13px;font-weight:600;color:var(--muted)}
+.pw-hint.warn{color:var(--coral)}
+.notes{align-items:flex-start}

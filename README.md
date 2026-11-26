@@ -10,7 +10,7 @@ Choisis ta licence, puis ton semestre.
   Le site affiche la moyenne de chaque bloc et la note à avoir **sur chaque épreuve restante** du bloc le plus serré.
 - Bouton **« validée ? »** sur chaque matière : pour une matière déjà acquise (redoublement).
   Elle sort du calcul : sa note ne compte pas.
-- Chaque matière a **1 à 6 CC** (2 par défaut, qui comptent pareil) et **1 rattrapage**. Le nombre se règle par matière (menu « épreuves », « 1 note » pour un stage ou un examen unique) ou pour tout le semestre (règles de calcul).
+- Chaque matière a **1 à 6 CC** (2 par défaut, qui comptent pareil sauf si tu changes leurs pourcentages avec le bouton « % », ex. 60 / 40 ou 25 / 65 / 10) et **1 rattrapage**. Le nombre se règle par matière (menu « épreuves », « 1 note » pour un stage ou un examen unique) ou pour tout le semestre (règles de calcul).
 - Tant qu'il reste des CC à passer, le site donne la note à viser au(x) CC restant(s).
   Quand tous les CC sont notés et que le semestre n'est pas validé, il donne la note à viser au rattrapage
   (bouton « rattrapage ? » sur chaque matière ; celles sous 10 sont cochées par défaut).
