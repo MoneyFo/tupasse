@@ -99,7 +99,8 @@ migrate();
 const dkey = (sem = S.sem) => S.lic + ':' + sem;
 const rowsOf = sem => S.data[dkey(sem)] || (S.data[dkey(sem)] = fresh(sem));
 const rows = () => rowsOf(S.sem);
-let view = 'welcome', pick = S.chosen ? S.sem : null;   // page affichée, semestre coché sur l'accueil
+// page affichée ; sur l'accueil : licence choisie pendant cette visite ? semestre coché ? (rien de pré-choisi à l'arrivée)
+let view = 'welcome', licPicked = false, pick = null;
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* stockage plein ou bloqué */ } };
 
 /* ---------- 3. nombres ---------- */
@@ -227,11 +228,13 @@ const pool = () => (annualOn() ? rows().concat(rowsOf(partner())) : rows());
 
 // accueil : menu des licences, grille des semestres, bouton calculer
 function welcome() {
-  $('licSel').innerHTML = GROUPS.map(([g, ks]) => `<optgroup label="${esc(g)}">${ks.filter(k => LIC[k])
-    .map(k => `<option value="${k}"${k === S.lic ? ' selected' : ''}>${esc(LIC[k].n)}</option>`).join('')}</optgroup>`).join('');
+  $('licSel').innerHTML = (licPicked ? '' : '<option value="" selected disabled>choisis ta licence…</option>')
+    + GROUPS.map(([g, ks]) => `<optgroup label="${esc(g)}">${ks.filter(k => LIC[k])
+      .map(k => `<option value="${k}"${licPicked && k === S.lic ? ' selected' : ''}>${esc(LIC[k].n)}</option>`).join('')}</optgroup>`).join('');
   if (pick && !P()[pick]) pick = null;
   $('calcBtn').disabled = !pick;
-  $('calcBtn').textContent = pick ? `calculer mon ${P()[pick][0].split(' · ')[1]} →` : 'choisis un semestre';
+  $('calcBtn').textContent = pick ? `calculer mon ${P()[pick][0].split(' · ')[1]} →` : licPicked ? 'choisis un semestre' : 'choisis ta licence';
+  if (!licPicked) { $('semGrid').innerHTML = '<p class="hint">choisis d’abord ta licence.</p>'; return; }
   const yrs = {};
   for (const k of Object.keys(P())) { const y = P()[k][0].split(' · ')[0]; (yrs[y] = yrs[y] || []).push(k); }
   const col = { L1: 'var(--teal)', L2: 'var(--lav)', L3: 'var(--pink)' };
@@ -463,8 +466,8 @@ document.addEventListener('click', e => {
     return;
   }
   // actions qui changent l'état
-  if (t.id === 'calcBtn') { if (!pick) return; S.sem = pick; S.chosen = true; view = 'app'; S.edit = !rows().length; window.scrollTo(0, 0); }
-  else if (t.id === 'licBtn') { view = 'welcome'; pick = S.sem; window.scrollTo(0, 0); }
+  if (t.id === 'calcBtn') { if (!pick) return; S.sem = pick; view = 'app'; S.edit = !rows().length; window.scrollTo(0, 0); }
+  else if (t.id === 'licBtn') { view = 'welcome'; licPicked = true; pick = null; window.scrollTo(0, 0); }   // on garde la licence, on re-choisit le semestre
   else if (t.dataset.rule) S.rule = t.dataset.rule;
   else if (t.dataset.ann) S.annual = t.dataset.ann === '1';
   else if (t.id === 'nccMinus' || t.id === 'nccPlus') S.ncc = Math.min(MAXCC, Math.max(1, S.ncc + (t.id === 'nccPlus' ? 1 : -1)));
@@ -500,6 +503,6 @@ function onField(e) {
   update();
 }
 $('list').addEventListener('input', onField);
-$('licSel').addEventListener('change', e => { S.lic = e.target.value; save(); welcome(); });
+$('licSel').addEventListener('change', e => { S.lic = e.target.value; licPicked = true; pick = null; save(); welcome(); });
 applyTheme();
 render();

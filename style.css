@@ -35,6 +35,7 @@ body[data-view=welcome] .wrap{padding-bottom:16px}
 .sel{appearance:none;-webkit-appearance:none;width:100%;height:54px;margin-bottom:26px;padding:0 48px 0 16px;font:700 16px var(--font);color:var(--ink);background:var(--surface) no-repeat right 16px center/18px var(--chevron);border:var(--b);border-radius:var(--r);box-shadow:var(--sh);cursor:pointer;outline:none;transition:box-shadow .15s,border-color .15s,transform .15s}
 .sel:focus{border-color:var(--coral);box-shadow:4px 4px 0 var(--coral);transform:translate(-1px,-1px)}
 .semgrid{display:grid;gap:12px}
+.semgrid .hint{margin:0;padding:18px;border:2px dashed var(--dash);border-radius:var(--r);color:var(--muted);font-weight:600;text-align:center}
 .yr{display:grid;grid-template-columns:44px minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:center}
 .yr b{font-size:15px;font-weight:800}
 /* bouton de semestre : couleur de l'année (--c), « enfoncé » quand il est choisi */
@@ -173,7 +174,7 @@ a.btn{color:var(--ink);text-decoration:none}
 .disc-h{display:flex;align-items:center;gap:14px;margin-bottom:16px}
 .disc-i{width:clamp(40px,5vw,54px);height:clamp(40px,5vw,54px);flex:none;display:grid;place-items:center;border:2px solid #111;border-radius:50%;background:var(--coral);color:#fff;font-weight:800;font-size:clamp(22px,3vw,30px);box-shadow:3px 3px 0 #111}
 .disc h2{font-size:clamp(34px,6vw,60px);font-weight:800;letter-spacing:-.02em;line-height:1}
-.disc ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.disc ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .disc li{background:#fff;border:2px solid #111;border-radius:10px;padding:12px 14px;font-weight:500;font-size:14.5px;line-height:1.45}
 .disc-warn{margin:16px 0 0;font-weight:700;font-size:15.5px;line-height:1.9}
 .disc-warn mark{background:var(--coral);color:#fff;padding:3px 8px;border-radius:6px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
