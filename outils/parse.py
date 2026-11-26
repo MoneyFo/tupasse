@@ -1,14 +1,29 @@
-"""Extrait les matières (bloc, nom, ECTS) des maquettes UPF (texte pdftotext -layout),
-en se servant de la position des colonnes « Heures » et « ECTS » de l'en-tête."""
-import re, json, glob, os
+"""Étape 1/2 : extrait les matières (bloc, nom, ECTS, options) des maquettes UPF.
 
+Utilisation :
+    pdftotext -layout "LICENCE Maths 2024-2028.pdf"      (un .txt par maquette, dans un même dossier)
+    python3 outils/parse.py DOSSIER_DES_TXT              → écrit DOSSIER_DES_TXT/parsed.json
+puis python3 outils/build.py DOSSIER_DES_TXT (étape 2).
+
+Méthode : pdftotext garde la mise en colonnes. On repère dans l'en-tête de chaque page la position
+des colonnes « Heures » et « ECTS » ; sur chaque ligne de matière (code « 1.4 »), le nom est le texte
+à gauche de « Heures » et les ECTS sont le nombre aligné sous « ECTS ».
+Le rapport affiché signale les semestres dont le total ou un bloc ne colle pas (« !! ») : à corriger dans build.py."""
+import re, json, glob, os, sys
+
+# ligne de matière : « 1.4 Nom… » (option : « 2.6.a », « 4.6a »), parfois précédée de « SEMESTRE 1 »
 code_re = re.compile(r'^(\s*(?:SEMESTRE\s*\d+\s+)?)(\d{1,2})\.(\d{1,2})([a-z.]*)(?=\s|$)')
+# en-tête de bloc : « DS1 DS1 Compétences… », « ES 5 … », « TS1 / LS1 … » ; DS3A / DS3B en éco-gestion
 bloc_re = re.compile(r'^\s*([A-Z]{2})\s?(\d{1,2})([A-Z]?)(?:\s*/\s*[A-Z]{2}\d{1,2})?(?:\s+\1\s?\2\3)?\s+(?=[A-ZÉa-zé])')
+# un nombre isolé (« 31,5 », « 4 »), pas un morceau de code ou de mot
 num_re = re.compile(r'(?<![\w.,])\d+(?:,\d+)?(?![\w.,])')
+# un nom qui finit par ces mots continue sur la ligne suivante
 CONT_END = re.compile(r'(\bet|\bde|\bdes|\bdu|\bla|\ble|\bles|\bà|\ben|\bau|\bpour|:|,|/|-|&|\()$', re.I)
+# lignes de texte qui ne sont jamais des noms de matières
 SKIP = ('SEMESTRE', 'Volume', 'TOTAL', 'DOMAINE', 'LICENCE', 'Mention', 'Parcours', 'NIVEAU', 'Bloc', 'CONTENU', 'compétences', '(h)', 'Auto', 'UE ', 'Heures', 'étudiants')
 
 def parse(path):
+    """Renvoie ({parcours: {semestre: [[bloc, nom, ects, options?], …]}}, [(parcours, sem, bloc, ects annoncés)])."""
     L = [l.replace('\f', '') for l in open(path, encoding='utf-8').read().split('\n')]
     out, checks = {}, []
     parc, bloc, hx, ex = '', None, 60, 140
@@ -105,9 +120,10 @@ def parse(path):
             row.append(opts)
     return out, checks
 
-def report(res_only=False):
+def report(folder):
+    """Analyse tous les .txt du dossier, affiche les contrôles et écrit parsed.json."""
     res = {}
-    for f in sorted(glob.glob('/home/claude/maq/*.txt')):
+    for f in sorted(glob.glob(os.path.join(folder, '*.txt'))):
         base = os.path.basename(f)[:-4]
         if base == 'orig_info':
             continue
@@ -123,7 +139,9 @@ def report(res_only=False):
                 exp = {c[2]: c[3] for c in checks if c[0] == parc and c[1] == s}
                 bad = {b: (byb.get(b, 0), exp[b]) for b in exp if exp[b] and float(exp[b].replace(',', '.')) != byb.get(b, 0)}
                 print(f'  [{parc[:30]}] S{s}: {len(rows)} mat, {tot:g} ects' + (f'  !! blocs {bad}' if bad else '') + ('' if tot == 30 else '  !! total'))
-    json.dump(res, open('/home/claude/maq/parsed.json', 'w'), ensure_ascii=False, indent=1)
+    json.dump(res, open(os.path.join(folder, 'parsed.json'), 'w'), ensure_ascii=False, indent=1)
 
 if __name__ == '__main__':
-    report()
+    if len(sys.argv) != 2:
+        sys.exit('usage : python3 outils/parse.py DOSSIER_DES_TXT')
+    report(sys.argv[1])

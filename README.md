@@ -40,9 +40,36 @@ Choix faits pour coller au calcul par bloc :
 
 ## Formule
 
-Note d'une matière = `(CC1 + CC2) / 2`, puis la règle de rattrapage choisie.
+Note d'une matière = `Σ (pourcentage × CC) / Σ pourcentages` (parts égales par défaut), puis la règle de rattrapage choisie.
 Moyenne d'un bloc = `Σ (ECTS × note de la matière) / Σ ECTS`.
 
-La note à viser est la plus petite note `x`, la même sur toutes les épreuves restantes, qui donne une moyenne ≥ objectif.
+La note à viser est la plus petite note `x`, la même sur toutes les épreuves restantes, qui donne une moyenne ≥ 10 dans chaque bloc.
 Pour les CC c'est direct : `x = (objectif × E − K) / U` (`E` total ECTS, `K` points déjà acquis, `U` poids des CC restants).
 Pour le rattrapage, la règle « garde le meilleur » n'est pas linéaire, donc `x` est trouvé par dichotomie.
+
+## Fichiers
+
+| fichier | rôle |
+|---|---|
+| `index.html` | la page : accueil (licence + semestre) et calcul, dans le même fichier |
+| `style.css` | le style néobrutaliste, rangé par sections, thème clair et sombre |
+| `script.js` | état, calculs, affichage, événements (sommaire en tête de fichier) |
+| `licences.js` | les maquettes, généré par `outils/` |
+| `tests/calc.test.js` | tests des calculs |
+| `outils/parse.py`, `outils/build.py` | extraction des maquettes depuis les PDF de l'UPF |
+
+## Tests
+
+```
+node tests/calc.test.js
+```
+
+Aucune dépendance : le test charge `licences.js` et `script.js` dans un faux navigateur minimal et compare les
+résultats à des valeurs calculées à la main (notes à viser, pourcentages, rattrapage, compensation annuelle,
+restauration d'un code abîmé). À lancer après chaque modification des calculs.
+
+## Mettre à jour les maquettes
+
+1. Mettre les PDF des maquettes dans un dossier et les convertir : `pdftotext -layout "LICENCE Maths 2024-2028.pdf"` (un `.txt` par PDF).
+2. `python3 outils/parse.py DOSSIER` : extrait les matières et signale (`!!`) les semestres dont le total ne colle pas.
+3. Corriger ces cas dans `outils/build.py`, puis `python3 outils/build.py DOSSIER` : réécrit `licences.js` et vérifie que chaque semestre fait 30 ECTS.

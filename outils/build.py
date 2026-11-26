@@ -1,12 +1,25 @@
-"""Construit licences.js à partir des maquettes UPF 2024-2028 extraites (parsed.json),
-des corrections relevées à la main et des maquettes saisies à la main (Éco-Gestion, PPPE, ERME)."""
-import json, re
+"""Étape 2/2 : construit licences.js à partir de parsed.json (étape 1, outils/parse.py),
+des corrections relevées à la main dans les PDF, et des maquettes saisies à la main
+(Économie-gestion, LLCER PPPE, licence pro ERME : leur mise en page ne se lit pas automatiquement).
 
-D = json.load(open('/home/claude/maq/parsed.json'))
-INFO = json.load(open('/home/claude/maq/info.json'))
+Utilisation : python3 outils/build.py DOSSIER_DES_TXT     → réécrit licences.js à la racine du projet.
+Informatique n'est pas relue depuis les PDF : on reprend celle du licences.js actuel (maquette 2025-2026).
+À la fin, chaque semestre doit faire 30 ECTS ; sinon il est signalé « <-- total »."""
+import json, os, re, sys
+
+if len(sys.argv) != 2:
+    sys.exit('usage : python3 outils/build.py DOSSIER_DES_TXT')
+MAQ = sys.argv[1]
+ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
+OUT = os.path.join(ROOT, 'licences.js')
+D = json.load(open(os.path.join(MAQ, 'parsed.json'), encoding='utf-8'))
+_js = open(OUT, encoding='utf-8').read()
+INFO = json.loads(_js[_js.index('{'):_js.rindex('}') + 1])['info']['P']
+# lignes d'une année d'après le numéro de semestre
 YEAR = {1: 'L1', 2: 'L1', 3: 'L2', 4: 'L2', 5: 'L3', 6: 'L3'}
 
 def clean(n):
+    """Nettoie un nom de matière lu dans le PDF (astérisques, mentions « au choix », restes de colonnes)."""
     n = re.sub(r'\s*\*\s*', ' ', n)
     n = re.sub(r'^Activités? d.ouverture.*$', "Activité d'ouverture", n)
     n = re.sub(r'\s*\((au choix|option obligatoire)\)\s*:?$', '', n)
@@ -19,33 +32,37 @@ def clean(n):
     return n[:1].upper() + n[1:]
 
 def opt(o):
+    """Nom d'une option (« Sport OU » → « Sport »)."""
     o = re.sub(r'\s+(OU|ou)$', '', o.strip())
     return o[:1].upper() + o[1:]
 
 def row(r):
+    """Ligne de parsed.json → [bloc, nom, ects] (+ [options] pour une matière à choix)."""
     b, n, e = r[:3]
     out = [b, clean(n), e]
     if len(r) > 3:
         out.append([opt(o) for o in r[3]])
     return out
 
-def sems(src, only=None):
-    """{'5': rows} -> {'S5': ['L3 · S5', rows]}"""
+def sems(src):
+    """{'5': lignes} → {'S5': ['L3 · S5', lignes nettoyées]}, le format de licences.js."""
     out = {}
     for k in sorted(src, key=int):
-        if only and int(k) not in only:
-            continue
         out['S' + k] = [f'{YEAR[int(k)]} · S{k}', [row(r) for r in src[k]]]
     return out
 
 def g(f, parc):
+    """Semestres d'un parcours d'une maquette, tels que lus par parse.py."""
     return D[f][parc]
 
 def insert_after(rows, after_name, row):
+    """Ajoute une matière oubliée par l'extraction, juste après une matière donnée."""
     i = next(i for i, r in enumerate(rows) if r[1] == after_name)
     rows.insert(i + 1, row)
 
+# L : toutes les licences, { id: {n: nom, P: semestres, blocs?: intitulés de blocs propres} }
 L = {}
+# options de l'activité d'ouverture (Informatique et Économie-gestion)
 ACT = ['Sport', 'Transitions (en français ou en anglais)']
 for k in ('S2', 'S4'):
     for r in INFO[k][1]:
@@ -125,7 +142,7 @@ L['llcer-lp'] = {'n': 'Licence LLCER Langues polynésiennes', 'P': P}
 
 # PPPE : lignes « LLC.LP-PE  1.01  Nom ... ECTS », blocs « PPPE.DS1 »
 pppe, bloc = {}, None
-for line in open('/home/claude/maq/LICENCE LLCER LP-PPPE 2024-2028.txt', encoding='utf-8'):
+for line in open(os.path.join(MAQ, 'LICENCE LLCER LP-PPPE 2024-2028.txt'), encoding='utf-8'):
     m = re.search(r'PPPE\.(DS|TS|LS|ES)(\d)', line)
     if m:
         bloc = m.group(1); continue
@@ -166,7 +183,7 @@ L['stes'] = {'n': 'Licence STES · Transitions en milieux multi-insulaires',
 
 # --- Licence pro ERME : une UE = un bloc
 erme, ue, names = {}, None, {}
-for line in open('/home/claude/maq/LICENCE PRO ERME 2024-2028.txt', encoding='utf-8'):
+for line in open(os.path.join(MAQ, 'LICENCE PRO ERME 2024-2028.txt'), encoding='utf-8'):
     m = re.match(r'^\s*ERME\s+(\d+)(?:\.(\d+))?\s+(.*?)\s{2,}(.*)$', line)
     if not m:
         continue
@@ -198,5 +215,5 @@ for k, v in L.items():
 print(len(L), 'licences')
 js = 'const LICENCES=' + json.dumps(L, ensure_ascii=False, separators=(',', ':')) + ';\n'
 js = js.replace('.0]', ']').replace('.0,', ',')
-open('/home/claude/tupasse/licences.js', 'w', encoding='utf-8').write(
+open(OUT, 'w', encoding='utf-8').write(
     '// maquettes UPF 2024-2028 (Informatique : maquette 2025-2026). généré par build.py\n' + js)
